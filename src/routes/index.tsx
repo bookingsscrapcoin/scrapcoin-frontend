@@ -348,7 +348,7 @@ function Index() {
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="fullName">Full name</Label>
-              <Input id="fullName" name="fullName" placeholder="Aarav Sharma" required />
+              <Input id="fullName" name="fullName" placeholder="Sai Shankar" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">WhatsApp number</Label>
@@ -358,7 +358,7 @@ function Index() {
                 type="tel"
                 inputMode="tel"
                 pattern="[0-9+ ]{10,15}"
-                placeholder="+91 98765 43210"
+                placeholder="+91 98765 12345"
                 required
               />
             </div>
@@ -367,7 +367,7 @@ function Index() {
               <Input
                 id="society"
                 name="society"
-                placeholder="e.g. Gaur City 2, Sector 16C, Greater Noida West"
+                placeholder="e.g. Gaur City , Sector 16C, Greater Noida West"
                 required
               />
             </div>
