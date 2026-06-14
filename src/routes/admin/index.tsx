@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
 
-export const Route = createFileRoute("/admin/")({
+export const Route = createFileRoute("/admin")({
   component: AdminDashboard,
 });
 
@@ -43,11 +43,12 @@ function AdminDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && (!user || profile?.role !== "admin")) {
-      navigate({ to: "/" });
-    }
-  }, [user, profile, authLoading, navigate]);
+// FIXED — waits for both auth AND profile to load
+useEffect(() => {
+  if (authLoading) return;
+  if (!user) { navigate({ to: "/" }); return; }
+  if (profile && profile.role !== "admin") { navigate({ to: "/" }); return; }
+}, [user, profile, authLoading, navigate]);
 
   useEffect(() => {
     if (!session?.access_token) return;

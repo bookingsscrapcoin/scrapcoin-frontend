@@ -55,11 +55,12 @@ function AdminCategories() {
     price_per_unit: "",
   });
 
-  useEffect(() => {
-    if (!authLoading && (!user || profile?.role !== "admin")) {
-      navigate({ to: "/" });
-    }
-  }, [user, profile, authLoading, navigate]);
+// FIXED — waits for both auth AND profile to load
+useEffect(() => {
+  if (authLoading) return;
+  if (!user) { navigate({ to: "/" }); return; }
+  if (profile && profile.role !== "admin") { navigate({ to: "/" }); return; }
+}, [user, profile, authLoading, navigate]);
 
   useEffect(() => {
     if (!session?.access_token) return;
