@@ -72,7 +72,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 function NavAuth() {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, loading, signOut } = useAuth();
   const navigate = useNavigate();
 
   async function handleSignOut() {
@@ -84,6 +84,9 @@ function NavAuth() {
       toast.error("Failed to sign out");
     }
   }
+
+  // Don't render until auth is ready
+  if (loading) return null;
 
   if (user) {
     return (
@@ -99,7 +102,7 @@ function NavAuth() {
             to="/admin"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Admin
+            Admin ⚙️
           </Link>
         )}
         <Button
