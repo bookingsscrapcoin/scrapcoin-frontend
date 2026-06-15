@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+const API_BASE = import.meta.env.VITE_API_URL ?? "/api";
 
 export type BookingPayload = {
   fullName: string;
@@ -27,7 +27,8 @@ export type LivePickup = {
 async function parseJson<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(body || `Request failed (${response.status})`);
+    const message = body || `Request failed (${response.status})`;
+    throw new Error(message);
   }
   return response.json() as Promise<T>;
 }
