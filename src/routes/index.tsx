@@ -545,14 +545,20 @@ function Index() {
               <li><a href="#" className="hover:text-foreground">Privacy policy</a></li>
             </ul>
             <div className="mt-4 flex gap-3">
-              {[Instagram, Facebook, Twitter].map((Ic, i) => (
+              {[
+                { Icon: Instagram, href: "https://www.instagram.com/scrapco.in", label: "Instagram" },
+                { Icon: Facebook, href: "#", label: "Facebook" },
+                { Icon: Twitter, href: "#", label: "Twitter" },
+              ].map(({ Icon, href, label }, i) => (
                 <a
                   key={i}
-                  href="#"
+                  href={href}
                   className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-                  aria-label="social"
+                  aria-label={label}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noreferrer noopener" : undefined}
                 >
-                  <Ic className="h-4 w-4" />
+                  <Icon className="h-4 w-4" />
                 </a>
               ))}
             </div>
