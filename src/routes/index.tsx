@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import {
@@ -132,6 +132,12 @@ function Index() {
             <BrandLogo size={56} />
           </a>
           <div className="flex items-center gap-3">
+            <Link
+              to="/rates"
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors mr-3"
+            >
+              Check Rates
+            </Link>
             <a href="#booking" className="hidden sm:block">
               <Button size="sm" className="rounded-full">Schedule a Pickup</Button>
             </a>
@@ -171,20 +177,20 @@ function Index() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a href="#booking">
-                <Button size="lg" className="rounded-full px-7 shadow-lg">
+                <Button size="lg" className="rounded-full px-7 shadow-lg cursor-pointer">
                   Schedule a Pickup
                 </Button>
               </a>
-              <a href="#how">
-                <Button size="lg" variant="outline" className="rounded-full px-6">
-                  How it works
+              <Link to="/rates">
+                <Button size="lg" variant="outline" className="rounded-full px-6 cursor-pointer">
+                  Check Scrap Rates
                 </Button>
-              </a>
+              </Link>
               <WhatsAppLink>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="rounded-full border-emerald-500/40 px-6 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                  className="rounded-full border-emerald-500/40 px-6 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer"
                 >
                   <MessageCircle className="mr-2 h-4 w-4" />
                   WhatsApp Us
