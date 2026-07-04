@@ -33,6 +33,8 @@ import { BrandLogo } from "@/components/brand-logo";
 import { WhatsAppFAB, WhatsAppLink } from "@/components/whatsapp-button";
 import { createBooking, fetchCircularImpact, type CircularImpact } from "@/lib/api";
 import { NavAuth } from "./__root";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -512,67 +514,7 @@ function Index() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/60 bg-background">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <BrandLogo size={40} showTagline />
-            <p className="mt-4 text-sm text-muted-foreground">
-              Sleek, transparent, tech-enabled scrap collection for modern urban lifestyle.
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-semibold">Contact</p>
-            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-primary" />
-                <span>+91 72920 16625</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-primary" />
-                <span>bookings.scrapco@gmail.com</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-primary" />
-                <span>Noida, India</span>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <p className="text-sm font-semibold">Service area</p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Serving apartment clusters and RWAs in Noida, UP.
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-semibold">Company</p>
-            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground">Terms of service</a></li>
-              <li><a href="#" className="hover:text-foreground">Privacy policy</a></li>
-            </ul>
-            <div className="mt-4 flex gap-3">
-              {[
-                { Icon: Instagram, href: "https://www.instagram.com/scrapco.in", label: "Instagram" },
-                { Icon: Facebook, href: "https://www.facebook.com/share/19DUEDLcYa", label: "Facebook" },
-                { Icon: Twitter, href: "https://x.com/thescrapcoin", label: "Twitter" },
-              ].map(({ Icon, href, label }, i) => (
-                <a
-                  key={i}
-                  href={href}
-                  className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-                  aria-label={label}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel={href.startsWith("http") ? "noreferrer noopener" : undefined}
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-border/60 py-5 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} The Scrap Co. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
 
       {/* Floating WhatsApp Button */}
       <WhatsAppFAB />

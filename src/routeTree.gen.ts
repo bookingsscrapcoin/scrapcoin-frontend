@@ -9,10 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RatesRouteImport } from './routes/rates'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as MyBookingsRouteImport } from './routes/my-bookings'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ImpactRouteImport } from './routes/impact'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CareersRouteImport } from './routes/careers'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
@@ -28,6 +37,11 @@ import { Route as AdminErpMaterialsRouteImport } from './routes/admin/erp/materi
 import { Route as AdminErpInvoicesRouteImport } from './routes/admin/erp/invoices'
 import { Route as AdminErpCustomersRouteImport } from './routes/admin/erp/customers'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -38,6 +52,16 @@ const RatesRoute = RatesRouteImport.update({
   path: '/rates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerRoute = PartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MyBookingsRoute = MyBookingsRouteImport.update({
   id: '/my-bookings',
   path: '/my-bookings',
@@ -46,6 +70,36 @@ const MyBookingsRoute = MyBookingsRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImpactRoute = ImpactRouteImport.update({
+  id: '/impact',
+  path: '/impact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -121,10 +175,19 @@ const AdminErpCustomersRoute = AdminErpCustomersRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/blog': typeof BlogRoute
+  '/careers': typeof CareersRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/impact': typeof ImpactRoute
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRoute
+  '/partner': typeof PartnerRoute
+  '/privacy': typeof PrivacyRoute
   '/rates': typeof RatesRoute
   '/register': typeof RegisterRoute
+  '/terms': typeof TermsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/erp': typeof AdminErpRouteWithChildren
@@ -141,10 +204,19 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/blog': typeof BlogRoute
+  '/careers': typeof CareersRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/impact': typeof ImpactRoute
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRoute
+  '/partner': typeof PartnerRoute
+  '/privacy': typeof PrivacyRoute
   '/rates': typeof RatesRoute
   '/register': typeof RegisterRoute
+  '/terms': typeof TermsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/users': typeof AdminUsersRoute
@@ -161,10 +233,19 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/blog': typeof BlogRoute
+  '/careers': typeof CareersRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/impact': typeof ImpactRoute
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRoute
+  '/partner': typeof PartnerRoute
+  '/privacy': typeof PrivacyRoute
   '/rates': typeof RatesRoute
   '/register': typeof RegisterRoute
+  '/terms': typeof TermsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/erp': typeof AdminErpRouteWithChildren
@@ -183,10 +264,19 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/blog'
+    | '/careers'
+    | '/contact'
+    | '/faq'
+    | '/impact'
     | '/login'
     | '/my-bookings'
+    | '/partner'
+    | '/privacy'
     | '/rates'
     | '/register'
+    | '/terms'
     | '/admin/bookings'
     | '/admin/categories'
     | '/admin/erp'
@@ -203,10 +293,19 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/blog'
+    | '/careers'
+    | '/contact'
+    | '/faq'
+    | '/impact'
     | '/login'
     | '/my-bookings'
+    | '/partner'
+    | '/privacy'
     | '/rates'
     | '/register'
+    | '/terms'
     | '/admin/bookings'
     | '/admin/categories'
     | '/admin/users'
@@ -222,10 +321,19 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/blog'
+    | '/careers'
+    | '/contact'
+    | '/faq'
+    | '/impact'
     | '/login'
     | '/my-bookings'
+    | '/partner'
+    | '/privacy'
     | '/rates'
     | '/register'
+    | '/terms'
     | '/admin/bookings'
     | '/admin/categories'
     | '/admin/erp'
@@ -243,10 +351,19 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  BlogRoute: typeof BlogRoute
+  CareersRoute: typeof CareersRoute
+  ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
+  ImpactRoute: typeof ImpactRoute
   LoginRoute: typeof LoginRoute
   MyBookingsRoute: typeof MyBookingsRoute
+  PartnerRoute: typeof PartnerRoute
+  PrivacyRoute: typeof PrivacyRoute
   RatesRoute: typeof RatesRoute
   RegisterRoute: typeof RegisterRoute
+  TermsRoute: typeof TermsRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminErpRoute: typeof AdminErpRouteWithChildren
@@ -256,6 +373,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -270,6 +394,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner': {
+      id: '/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/my-bookings': {
       id: '/my-bookings'
       path: '/my-bookings'
@@ -282,6 +420,48 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/impact': {
+      id: '/impact'
+      path: '/impact'
+      fullPath: '/impact'
+      preLoaderRoute: typeof ImpactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -413,10 +593,19 @@ const AdminErpRouteWithChildren = AdminErpRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  BlogRoute: BlogRoute,
+  CareersRoute: CareersRoute,
+  ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
+  ImpactRoute: ImpactRoute,
   LoginRoute: LoginRoute,
   MyBookingsRoute: MyBookingsRoute,
+  PartnerRoute: PartnerRoute,
+  PrivacyRoute: PrivacyRoute,
   RatesRoute: RatesRoute,
   RegisterRoute: RegisterRoute,
+  TermsRoute: TermsRoute,
   AdminBookingsRoute: AdminBookingsRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminErpRoute: AdminErpRouteWithChildren,

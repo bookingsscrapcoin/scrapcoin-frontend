@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NavAuth } from "./__root";
+import { Footer } from "@/components/Footer";
 
 export const Route = createFileRoute("/rates")({
   head: () => ({
@@ -204,9 +205,7 @@ function RatesPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/60 bg-background/50 py-6 text-center text-xs text-muted-foreground mt-auto">
-        © {new Date().getFullYear()} The Scrap Co. All rights reserved.
-      </footer>
+      <Footer />
     </div>
   );
 }
