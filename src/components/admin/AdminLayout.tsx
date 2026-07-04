@@ -7,6 +7,7 @@ import {
   LogOut,
   Menu,
   X,
+  Package,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { to: "/admin/bookings", label: "Bookings", icon: PackageSearch, exact: false },
   { to: "/admin/categories", label: "Categories", icon: Tags, exact: false },
   { to: "/admin/users", label: "Users", icon: Users, exact: false },
+  { to: "/admin/erp", label: "ERP Management", icon: Package, exact: false },
 ];
 
 function NavLinks({ onClose }: { onClose?: () => void }) {

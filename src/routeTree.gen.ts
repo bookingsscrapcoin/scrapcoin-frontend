@@ -16,8 +16,17 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminErpRouteImport } from './routes/admin/erp'
 import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 import { Route as AdminBookingsRouteImport } from './routes/admin/bookings'
+import { Route as AdminErpIndexRouteImport } from './routes/admin/erp/index'
+import { Route as AdminErpWhatsappRouteImport } from './routes/admin/erp/whatsapp'
+import { Route as AdminErpTransactionsRouteImport } from './routes/admin/erp/transactions'
+import { Route as AdminErpSuppliersRouteImport } from './routes/admin/erp/suppliers'
+import { Route as AdminErpReceiptsRouteImport } from './routes/admin/erp/receipts'
+import { Route as AdminErpMaterialsRouteImport } from './routes/admin/erp/materials'
+import { Route as AdminErpInvoicesRouteImport } from './routes/admin/erp/invoices'
+import { Route as AdminErpCustomersRouteImport } from './routes/admin/erp/customers'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -54,6 +63,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminErpRoute = AdminErpRouteImport.update({
+  id: '/admin/erp',
+  path: '/admin/erp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/admin/categories',
   path: '/admin/categories',
@@ -64,6 +78,46 @@ const AdminBookingsRoute = AdminBookingsRouteImport.update({
   path: '/admin/bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminErpIndexRoute = AdminErpIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminErpRoute,
+} as any)
+const AdminErpWhatsappRoute = AdminErpWhatsappRouteImport.update({
+  id: '/whatsapp',
+  path: '/whatsapp',
+  getParentRoute: () => AdminErpRoute,
+} as any)
+const AdminErpTransactionsRoute = AdminErpTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AdminErpRoute,
+} as any)
+const AdminErpSuppliersRoute = AdminErpSuppliersRouteImport.update({
+  id: '/suppliers',
+  path: '/suppliers',
+  getParentRoute: () => AdminErpRoute,
+} as any)
+const AdminErpReceiptsRoute = AdminErpReceiptsRouteImport.update({
+  id: '/receipts',
+  path: '/receipts',
+  getParentRoute: () => AdminErpRoute,
+} as any)
+const AdminErpMaterialsRoute = AdminErpMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => AdminErpRoute,
+} as any)
+const AdminErpInvoicesRoute = AdminErpInvoicesRouteImport.update({
+  id: '/invoices',
+  path: '/invoices',
+  getParentRoute: () => AdminErpRoute,
+} as any)
+const AdminErpCustomersRoute = AdminErpCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => AdminErpRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,8 +127,17 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/erp': typeof AdminErpRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/erp/customers': typeof AdminErpCustomersRoute
+  '/admin/erp/invoices': typeof AdminErpInvoicesRoute
+  '/admin/erp/materials': typeof AdminErpMaterialsRoute
+  '/admin/erp/receipts': typeof AdminErpReceiptsRoute
+  '/admin/erp/suppliers': typeof AdminErpSuppliersRoute
+  '/admin/erp/transactions': typeof AdminErpTransactionsRoute
+  '/admin/erp/whatsapp': typeof AdminErpWhatsappRoute
+  '/admin/erp/': typeof AdminErpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +149,14 @@ export interface FileRoutesByTo {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/erp/customers': typeof AdminErpCustomersRoute
+  '/admin/erp/invoices': typeof AdminErpInvoicesRoute
+  '/admin/erp/materials': typeof AdminErpMaterialsRoute
+  '/admin/erp/receipts': typeof AdminErpReceiptsRoute
+  '/admin/erp/suppliers': typeof AdminErpSuppliersRoute
+  '/admin/erp/transactions': typeof AdminErpTransactionsRoute
+  '/admin/erp/whatsapp': typeof AdminErpWhatsappRoute
+  '/admin/erp': typeof AdminErpIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -96,8 +167,17 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/erp': typeof AdminErpRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/erp/customers': typeof AdminErpCustomersRoute
+  '/admin/erp/invoices': typeof AdminErpInvoicesRoute
+  '/admin/erp/materials': typeof AdminErpMaterialsRoute
+  '/admin/erp/receipts': typeof AdminErpReceiptsRoute
+  '/admin/erp/suppliers': typeof AdminErpSuppliersRoute
+  '/admin/erp/transactions': typeof AdminErpTransactionsRoute
+  '/admin/erp/whatsapp': typeof AdminErpWhatsappRoute
+  '/admin/erp/': typeof AdminErpIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -109,8 +189,17 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/bookings'
     | '/admin/categories'
+    | '/admin/erp'
     | '/admin/users'
     | '/admin/'
+    | '/admin/erp/customers'
+    | '/admin/erp/invoices'
+    | '/admin/erp/materials'
+    | '/admin/erp/receipts'
+    | '/admin/erp/suppliers'
+    | '/admin/erp/transactions'
+    | '/admin/erp/whatsapp'
+    | '/admin/erp/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +211,14 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/users'
     | '/admin'
+    | '/admin/erp/customers'
+    | '/admin/erp/invoices'
+    | '/admin/erp/materials'
+    | '/admin/erp/receipts'
+    | '/admin/erp/suppliers'
+    | '/admin/erp/transactions'
+    | '/admin/erp/whatsapp'
+    | '/admin/erp'
   id:
     | '__root__'
     | '/'
@@ -131,8 +228,17 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/bookings'
     | '/admin/categories'
+    | '/admin/erp'
     | '/admin/users'
     | '/admin/'
+    | '/admin/erp/customers'
+    | '/admin/erp/invoices'
+    | '/admin/erp/materials'
+    | '/admin/erp/receipts'
+    | '/admin/erp/suppliers'
+    | '/admin/erp/transactions'
+    | '/admin/erp/whatsapp'
+    | '/admin/erp/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -143,6 +249,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminErpRoute: typeof AdminErpRouteWithChildren
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -198,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/erp': {
+      id: '/admin/erp'
+      path: '/admin/erp'
+      fullPath: '/admin/erp'
+      preLoaderRoute: typeof AdminErpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/admin/categories'
@@ -212,8 +326,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/erp/': {
+      id: '/admin/erp/'
+      path: '/'
+      fullPath: '/admin/erp/'
+      preLoaderRoute: typeof AdminErpIndexRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/whatsapp': {
+      id: '/admin/erp/whatsapp'
+      path: '/whatsapp'
+      fullPath: '/admin/erp/whatsapp'
+      preLoaderRoute: typeof AdminErpWhatsappRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/transactions': {
+      id: '/admin/erp/transactions'
+      path: '/transactions'
+      fullPath: '/admin/erp/transactions'
+      preLoaderRoute: typeof AdminErpTransactionsRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/suppliers': {
+      id: '/admin/erp/suppliers'
+      path: '/suppliers'
+      fullPath: '/admin/erp/suppliers'
+      preLoaderRoute: typeof AdminErpSuppliersRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/receipts': {
+      id: '/admin/erp/receipts'
+      path: '/receipts'
+      fullPath: '/admin/erp/receipts'
+      preLoaderRoute: typeof AdminErpReceiptsRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/materials': {
+      id: '/admin/erp/materials'
+      path: '/materials'
+      fullPath: '/admin/erp/materials'
+      preLoaderRoute: typeof AdminErpMaterialsRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/invoices': {
+      id: '/admin/erp/invoices'
+      path: '/invoices'
+      fullPath: '/admin/erp/invoices'
+      preLoaderRoute: typeof AdminErpInvoicesRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/customers': {
+      id: '/admin/erp/customers'
+      path: '/customers'
+      fullPath: '/admin/erp/customers'
+      preLoaderRoute: typeof AdminErpCustomersRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
   }
 }
+
+interface AdminErpRouteChildren {
+  AdminErpCustomersRoute: typeof AdminErpCustomersRoute
+  AdminErpInvoicesRoute: typeof AdminErpInvoicesRoute
+  AdminErpMaterialsRoute: typeof AdminErpMaterialsRoute
+  AdminErpReceiptsRoute: typeof AdminErpReceiptsRoute
+  AdminErpSuppliersRoute: typeof AdminErpSuppliersRoute
+  AdminErpTransactionsRoute: typeof AdminErpTransactionsRoute
+  AdminErpWhatsappRoute: typeof AdminErpWhatsappRoute
+  AdminErpIndexRoute: typeof AdminErpIndexRoute
+}
+
+const AdminErpRouteChildren: AdminErpRouteChildren = {
+  AdminErpCustomersRoute: AdminErpCustomersRoute,
+  AdminErpInvoicesRoute: AdminErpInvoicesRoute,
+  AdminErpMaterialsRoute: AdminErpMaterialsRoute,
+  AdminErpReceiptsRoute: AdminErpReceiptsRoute,
+  AdminErpSuppliersRoute: AdminErpSuppliersRoute,
+  AdminErpTransactionsRoute: AdminErpTransactionsRoute,
+  AdminErpWhatsappRoute: AdminErpWhatsappRoute,
+  AdminErpIndexRoute: AdminErpIndexRoute,
+}
+
+const AdminErpRouteWithChildren = AdminErpRoute._addFileChildren(
+  AdminErpRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -223,6 +419,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   AdminBookingsRoute: AdminBookingsRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminErpRoute: AdminErpRouteWithChildren,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
