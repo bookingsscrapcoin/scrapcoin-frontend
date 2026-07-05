@@ -6,5 +6,8 @@
   "main": "src/server.ts",
   "observability": {
     "enabled": false
+  },
+  "build": {
+    "command": "npm run build"
   }
 }
