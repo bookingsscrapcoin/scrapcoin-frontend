@@ -15,8 +15,8 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4 text-left">
         <div>
           <BrandLogo size={40} showTagline />
-          <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-            Sleek, transparent, tech-enabled scrap collection for a modern urban lifestyle. Noida's trusted recycling partner.
+          <p className="mt-4 text-xs text-muted-foreground leading-relaxed font-medium">
+            Waste to Worth — making scrap pickup transparent, tech-enabled, and instant across Noida & Greater Noida.
           </p>
         </div>
         <div>
@@ -32,15 +32,18 @@ export function Footer() {
             </li>
             <li className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-primary shrink-0" />
-              <span>Noida, Uttar Pradesh, India</span>
+              <span>Noida & Greater Noida</span>
             </li>
           </ul>
         </div>
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-foreground">Service Area</p>
-          <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-            Serving apartment clusters, societies, and RWAs in Noida, Greater Noida, and Indirapuram.
-          </p>
+          <ul className="mt-4 space-y-1.5 text-xs text-muted-foreground font-semibold">
+            <li>Greater Noida</li>
+            <li>Indirapuram</li>
+            <li>Noida</li>
+            <li className="text-[10px] font-normal italic text-muted-foreground/75 pt-1">More areas coming soon</li>
+          </ul>
         </div>
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-foreground">Company</p>

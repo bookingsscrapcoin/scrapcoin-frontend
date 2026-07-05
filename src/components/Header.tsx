@@ -14,10 +14,10 @@ export function Header() {
         {/* Navigation links */}
         <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-muted-foreground">
           <Link to="/about" className="hover:text-foreground transition-colors" activeProps={{ className: "text-foreground font-bold" }}>
-            About Us
+            About
           </Link>
           <Link to="/rates" className="hover:text-foreground transition-colors" activeProps={{ className: "text-foreground font-bold" }}>
-            Check Rates
+            Rates
           </Link>
           <Link to="/faq" className="hover:text-foreground transition-colors" activeProps={{ className: "text-foreground font-bold" }}>
             FAQ
