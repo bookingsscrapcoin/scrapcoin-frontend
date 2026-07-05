@@ -10,7 +10,7 @@ export function Header() {
         <Link to="/" aria-label="The Scrap Co. home">
           <BrandLogo size={60} />
         </Link>
-        
+
         {/* Navigation links */}
         <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-muted-foreground">
           <Link to="/about" className="hover:text-foreground transition-colors" activeProps={{ className: "text-foreground font-bold" }}>

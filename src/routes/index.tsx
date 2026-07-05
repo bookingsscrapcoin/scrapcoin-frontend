@@ -18,6 +18,9 @@ import {
   Twitter,
   CheckCircle2,
   MessageCircle,
+  Truck,
+  Building,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,6 +65,25 @@ const FALLBACK_IMPACT: CircularImpact = {
     { categoryId: "others", label: "Others", weightKg: 45.0 }
   ]
 };
+
+function CountUp({ end, duration = 1200, decimals = 0 }: { end: number; duration?: number; decimals?: number }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      setCount(progress * end);
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [end, duration]);
+
+  return <>{count.toLocaleString("en-IN", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</>;
+}
 
 function Index() {
   const { session } = useAuth();
@@ -119,6 +141,15 @@ function Index() {
       setSubmitting(false);
     }
   };
+
+  // Dynamic pricing calculation
+  let minEst = 0;
+  let maxEst = 0;
+  if (materials.includes("Paper / Cardboard")) { minEst += 50; maxEst += 150; }
+  if (materials.includes("Plastics")) { minEst += 30; maxEst += 100; }
+  if (materials.includes("Metals")) { minEst += 100; maxEst += 450; }
+  if (materials.includes("E-Waste")) { minEst += 100; maxEst += 900; }
+  if (materials.includes("Others")) { minEst += 20; maxEst += 100; }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -214,27 +245,47 @@ function Index() {
                 <div>
                   <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Scrap Saved from Landfill</p>
                   <p className="mt-1 text-2xl font-black text-foreground">
-                    {impact.grandTotalKg.toLocaleString()} kg
+                    <CountUp end={impact.grandTotalKg} decimals={1} /> kg
                   </p>
                 </div>
                 <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 flex items-center gap-1.5 border border-emerald-500/20">
                   <Leaf className="h-3 w-3" /> Saved from Landfills
                 </span>
               </div>
-
+ 
               <p className="mt-4 text-xs text-muted-foreground">
                 Total weight of recyclable scrap materials collected, traced, and diverted to certified recycling channels.
               </p>
-
+ 
               <div className="mt-6 grid grid-cols-2 gap-3">
                 {impact.breakdown.map((r) => (
                   <div key={r.categoryId} className="rounded-xl border border-border/60 bg-background p-3.5 transition-all hover:border-primary/30">
                     <p className="text-xs text-muted-foreground font-medium">{r.label}</p>
-                    <p className="mt-1 text-lg font-bold text-foreground">{r.weightKg.toLocaleString()} kg</p>
+                    <p className="mt-1 text-lg font-bold text-foreground">
+                      <CountUp end={r.weightKg} decimals={0} /> kg
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Badges Strip */}
+      <section className="border-y border-border/50 bg-primary/5 py-4 w-full">
+        <div className="mx-auto max-w-6xl px-4 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
+          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-muted-foreground">
+            <span className="text-lg">⚖️</span>
+            <span>Digital Scales, Verified Weight</span>
+          </div>
+          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-muted-foreground">
+            <span className="text-lg">💸</span>
+            <span>Instant UPI Payment</span>
+          </div>
+          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-muted-foreground">
+            <span className="text-lg">♻️</span>
+            <span>Certified Recycling Partners</span>
           </div>
         </div>
       </section>
@@ -251,18 +302,18 @@ function Index() {
           {[
             {
               icon: CalendarCheck,
-              title: "Whatsapp Us",
-              desc: "We will work out a slot that works for both of us.",
+              title: "Book Online",
+              desc: "Fill in the booking form — takes under 2 minutes. Select your materials and preferred pickup date.",
             },
             {
               icon: Scale,
-              title: "Doorstep transparent Weighing",
-              desc: "Calibrated scales — weigh every gram accurately.",
+              title: "We Come to You",
+              desc: "Our trained champion collector arrives at your society with a calibrated digital scale. You verify the weight.",
             },
             {
               icon: Smartphone,
-              title: "Instant UPI Payment",
-              desc: "Get paid on the spot, straight to your Bank A/c.",
+              title: "Get Paid Instantly",
+              desc: "Receive payment directly to your UPI account on the spot. No waiting, no follow-ups.",
             },
           ].map((s, i) => (
             <div
@@ -289,53 +340,49 @@ function Index() {
       <section className="bg-muted/40 py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Our services</h2>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Why Choose Us</h2>
             <p className="mt-3 text-muted-foreground">
-              Built around how apartment communities actually live.
+              Built around how modern apartment communities live and recycle.
             </p>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div
-              className="rounded-2xl border border-border/60 bg-card p-7"
+              className="rounded-2xl border border-border/60 bg-card p-7 transition-all hover:shadow-md"
               style={{ boxShadow: "var(--shadow-card)" }}
             >
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary text-primary-foreground">
-                <Home className="h-6 w-6" />
+              <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">
+                <Building className="h-6 w-6" />
               </span>
-              <h3 className="mt-5 text-xl font-semibold">Doorstep Household Collection</h3>
-              <p className="mt-2 text-muted-foreground">
-                Schedule, weigh, get paid — without
-                leaving your flat.
+              <h3 className="mt-5 text-xl font-semibold">Works in 30+ Societies</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                Serving Greater Noida, Noida Extension, Indirapuram, and more. Expanding weekly.
               </p>
-              <ul className="mt-5 space-y-2 text-sm">
-                {["Slot-based pickup", "All recyclables accepted", "Digital receipt"].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-muted-foreground">
-                    <CheckCircle2 className="h-4 w-4 text-primary" /> {f}
-                  </li>
-                ))}
-              </ul>
             </div>
+            
             <div
-              className="rounded-2xl border border-dashed border-border/80 bg-background/60 p-7 text-muted-foreground"
+              className="rounded-2xl border border-border/60 bg-card p-7 transition-all hover:shadow-md"
+              style={{ boxShadow: "var(--shadow-card)" }}
             >
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-secondary/10 text-secondary">
-                <Recycle className="h-6 w-6" />
+              <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">
+                <Truck className="h-6 w-6" />
               </span>
-              <h3 className="mt-5 text-xl font-semibold text-foreground">AOA Bulk Tie-ups</h3>
-              <p className="mt-2">
-                Scheduled society-wide drives with reporting dashboards for the RWA.
+              <h3 className="mt-5 text-xl font-semibold">Arrives Within 24 Hours</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                Book today, get your pickup scheduled. Our collectors are local to your area.
               </p>
-              <p className="mt-5 text-xs uppercase tracking-wider text-primary">Coming soon</p>
             </div>
-            <div className="rounded-2xl border border-dashed border-border/80 bg-background/60 p-7 text-muted-foreground">
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-secondary/10 text-secondary">
-                <ShieldCheck className="h-6 w-6" />
+
+            <div
+              className="rounded-2xl border border-border/60 bg-card p-7 transition-all hover:shadow-md"
+              style={{ boxShadow: "var(--shadow-card)" }}
+            >
+              <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">
+                <FileText className="h-6 w-6" />
               </span>
-              <h3 className="mt-5 text-xl font-semibold text-foreground">E-Waste Compliance</h3>
-              <p className="mt-2">
-                Certified channels for batteries, electronics and hazardous items.
+              <h3 className="mt-5 text-xl font-semibold">Digital Receipt Every Pickup</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                Every pickup gets a digital record — material, weight, rate, and amount paid.
               </p>
-              <p className="mt-5 text-xs uppercase tracking-wider text-primary">Coming soon</p>
             </div>
           </div>
         </div>
@@ -351,7 +398,7 @@ function Index() {
             Schedule a pickup
           </h2>
           <p className="mt-3 text-muted-foreground">
-            We'll send a WhatsApp confirmation within minutes.
+            Get your recyclables collected and paid out dynamically.
           </p>
         </div>
 
@@ -361,6 +408,11 @@ function Index() {
           className="mt-10 rounded-3xl border border-border/60 bg-card p-6 sm:p-10"
           style={{ boxShadow: "var(--shadow-elegant)" }}
         >
+          <div className="mb-6 text-left">
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-semibold text-primary">
+              ⚡ Quick booking — under 2 minutes. No account needed.
+            </span>
+          </div>
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="fullName">Full name</Label>
@@ -445,71 +497,120 @@ function Index() {
               </div>
             </div>
           </div>
+
+          {materials.length > 0 && (
+            <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-center text-xs animate-in fade-in duration-200 text-foreground">
+              <p className="font-bold">
+                💰 Estimated payout: <span className="text-primary font-extrabold text-sm sm:text-base">₹{minEst} – ₹{maxEst}</span>
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Based on current rates • Actual payout depends on exact weight measured at collection
+              </p>
+            </div>
+          )}
+
           <Button
             type="submit"
             size="lg"
             disabled={submitting}
-            className="mt-8 w-full rounded-full text-base shadow-lg"
+            className="mt-8 w-full rounded-full text-base shadow-lg cursor-pointer"
           >
             {submitting ? "Confirming..." : "Confirm Booking"}
           </Button>
           <p className="mt-3 text-center text-xs text-muted-foreground">
-            By confirming, you agree to our friendly pickup terms. No spam, ever.
+            You'll receive a WhatsApp confirmation within 4 hours.
           </p>
         </form>
       </section>
 
-      {/* Tech advantage */}
-      <section
-        className="relative overflow-hidden py-16 sm:py-24"
-        style={{ background: "var(--gradient-hero)" }}
-      >
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 lg:grid-cols-2 lg:items-center">
-          <div className="text-primary-foreground">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur">
-              <ShieldCheck className="h-3.5 w-3.5" /> The Tech Advantage
+      {/* Testimonials Section */}
+      <section className="bg-muted/30 py-16 sm:py-24 border-t border-border/60">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              Testimonials
             </span>
-            <h2 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">
-              A digital-to-circular pipeline you can actually trust.
-            </h2>
-            <p className="mt-4 text-primary-foreground/80">
-              Every kilo we collect is logged, traced, and routed to certified recyclers.
-              We're built for the next generation of urban waste rules.
+            <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">What our customers say</h2>
+            <p className="mt-3 text-muted-foreground">
+              Real reviews from real residents in Noida and Greater Noida.
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              {
-                icon: Scale,
-                title: "Live digital weighing",
-                desc: "IoT-connected scales stream weight to your booking — no disputes.",
-              },
-              {
-                icon: Recycle,
-                title: "End-to-end traceability",
-                desc: "Track each material from your doorstep to its recycler.",
-              },
-              {
-                icon: ShieldCheck,
-                title: "SWM 2026 compliant",
-                desc: "Aligned with India's Solid Waste Management 2026 framework.",
-              },
-              {
-                icon: Leaf,
-                title: "Verified circular impact",
-                desc: "Monthly impact reports for residents and AOAs.",
-              },
-            ].map((f) => (
-              <div
-                key={f.title}
-                className="rounded-2xl border border-white/15 bg-white/10 p-5 text-primary-foreground backdrop-blur"
-              >
-                <f.icon className="h-6 w-6" />
-                <h3 className="mt-3 font-semibold">{f.title}</h3>
-                <p className="mt-1 text-sm text-primary-foreground/80">{f.desc}</p>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-2 max-w-4xl mx-auto text-left">
+            <div className="rounded-2xl border border-border/65 bg-card p-6 shadow-sm space-y-4 relative overflow-hidden">
+              <div className="text-amber-500 flex gap-0.5 text-xs">⭐⭐⭐⭐⭐</div>
+              <p className="text-sm text-muted-foreground leading-relaxed relative z-10 italic">
+                &quot;Got ₹420 for boxes and old newspapers I was about to throw away. The whole thing took 15 minutes. Will definitely book again.&quot;
+              </p>
+              <div className="border-t border-border/40 pt-3 flex justify-between items-center text-xs">
+                <span className="font-bold text-foreground">Priya S.</span>
+                <span className="text-muted-foreground">Gaur City 2</span>
               </div>
-            ))}
+            </div>
+
+            <div className="rounded-2xl border border-border/65 bg-card p-6 shadow-sm space-y-4 relative overflow-hidden">
+              <div className="text-amber-500 flex gap-0.5 text-xs">⭐⭐⭐⭐⭐</div>
+              <p className="text-sm text-muted-foreground leading-relaxed relative z-10 italic">
+                &quot;I was skeptical about the digital scale but I could see the reading myself. Paid on the spot via Gpay. Legit service.&quot;
+              </p>
+              <div className="border-t border-border/40 pt-3 flex justify-between items-center text-xs">
+                <span className="font-bold text-foreground">Rahul M.</span>
+                <span className="text-muted-foreground">Greater Noida West</span>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ Snippet Section */}
+      <section className="mx-auto max-w-4xl px-4 py-16 sm:py-24 border-t border-border/60 text-left">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            FAQ
+          </span>
+          <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Common Questions</h2>
+          <p className="mt-3 text-muted-foreground">
+            Quick answers to the questions we get asked most often.
+          </p>
+        </div>
+
+        <div className="mt-12 space-y-3 max-w-2xl mx-auto">
+          {[
+            {
+              q: "How is the weight calculated?",
+              a: "We use calibrated digital scales at your doorstep. You can inspect the scale reading yourself during collection — there are no hidden rounding cuts or estimations.",
+            },
+            {
+              q: "When and how do I get paid?",
+              a: "On the spot, at the time of pickup, via UPI (PhonePe, GPay, Paytm, etc.). You receive the payout directly in your bank account before our collector leaves.",
+            },
+            {
+              q: "What types of scrap do you accept?",
+              a: "We collect paper, cardboard, plastics, metals (ferrous and non-ferrous), and electronic waste. Check our rates page for the complete list of accepted grades.",
+            },
+            {
+              q: "Which areas do you serve?",
+              a: "We currently cover Noida, Greater Noida, and Indirapuram. We are constantly expanding to new sectors and housing societies in NCR.",
+            },
+          ].map((faq, idx) => (
+            <div key={idx} className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
+              <details className="group">
+                <summary className="w-full px-5 py-4 flex items-center justify-between text-left font-semibold text-xs sm:text-sm text-foreground hover:bg-muted/10 cursor-pointer list-none">
+                  <span>{faq.q}</span>
+                  <span className="text-muted-foreground group-open:rotate-180 transition-transform duration-200">▼</span>
+                </summary>
+                <div className="px-5 pb-4 pt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed border-t border-border/40">
+                  <div className="pt-2">{faq.a}</div>
+                </div>
+              </details>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 text-center">
+          <Link to="/faq" className="text-xs font-semibold text-primary hover:underline">
+            More questions? View all FAQs →
+          </Link>
         </div>
       </section>
 
