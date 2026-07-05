@@ -29,7 +29,7 @@ export function Header() {
           style={{ backgroundColor: "#1a6b3a", minHeight: "38px" }}
         >
           <span className="truncate pr-4">
-            🎉 Now serving Gaur City 2, Sector 16C & Indirapuram — Book your pickup today
+            🎉 Now serving Noida, Greater Noida & Indirapuram — Book your pickup today
           </span>
           <button
             onClick={handleClose}
