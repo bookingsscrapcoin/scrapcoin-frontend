@@ -5,31 +5,36 @@ import { Button } from "@/components/ui/button";
 import { NavAuth } from "../routes/__root";
 import { X } from "lucide-react";
 
+// Bump this version string whenever you want the banner to re-appear for users who dismissed it
+const BANNER_VERSION = "v3-serving-noida";
+
 export function Header() {
+  // Default true for SSR — banner is always visible on first render
   const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
-    const isClosed = localStorage.getItem("scrapco-banner-closed");
-    if (isClosed === "true") {
+    // Only dismiss if user closed THIS specific banner version
+    const closedVersion = sessionStorage.getItem("scrapco-banner-closed");
+    if (closedVersion === BANNER_VERSION) {
       setIsOpen(false);
     }
   }, []);
 
   const handleClose = () => {
     setIsOpen(false);
-    localStorage.setItem("scrapco-banner-closed", "true");
+    sessionStorage.setItem("scrapco-banner-closed", BANNER_VERSION);
   };
 
   return (
     <>
-      {/* Announcement Banner */}
+      {/* Announcement Banner — always shows for new sessions / new versions */}
       {isOpen && (
         <div
           className="w-full text-white text-center py-2 px-8 text-[11px] sm:text-xs font-semibold relative flex items-center justify-center shrink-0 z-50"
           style={{ backgroundColor: "#1a6b3a", minHeight: "38px" }}
         >
           <span className="truncate pr-4">
-            🎉 Now serving Noida, Greater Noida & Indirapuram — Book your pickup today
+            🎉 Now serving Noida, Greater Noida &amp; Indirapuram — Book your pickup today
           </span>
           <button
             onClick={handleClose}
