@@ -158,6 +158,56 @@ export function NavAuth() {
   );
 }
 
+const JSON_LD_LOCAL_BUSINESS = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": "https://scrapco.in/#business",
+  name: "The Scrap Co.",
+  description:
+    "Tech-enabled doorstep scrap pickup for apartments and RWAs in Greater Noida West, Noida, and Indirapuram. Transparent weighing, instant UPI payment, full traceability.",
+  url: "https://scrapco.in",
+  logo: "https://scrapco.in/images/logo.jpg",
+  image: "https://scrapco.in/images/Screenshot-1.png",
+  telephone: "+91-72920-16625",
+  email: "bookings.scrapco@gmail.com",
+  priceRange: "₹",
+  currenciesAccepted: "INR",
+  paymentAccepted: "UPI, Cash",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Greater Noida West",
+    addressRegion: "Uttar Pradesh",
+    addressCountry: "IN",
+  },
+  areaServed: [
+    { "@type": "City", name: "Greater Noida" },
+    { "@type": "City", name: "Noida" },
+    { "@type": "City", name: "Indirapuram" },
+  ],
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    opens: "09:00",
+    closes: "18:00",
+  },
+  sameAs: [
+    "https://www.instagram.com/scrapco.in",
+    "https://www.facebook.com/share/19DUEDLcYa",
+    "https://x.com/thescrapcoin",
+  ],
+  serviceType: "Scrap Collection and Recycling",
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Scrap Materials",
+    itemListElement: [
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Paper & Cardboard Pickup" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Metal Scrap Pickup" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Plastic Scrap Pickup" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "E-Waste Pickup" } },
+    ],
+  },
+});
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -170,30 +220,41 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Tech-enabled doorstep scrap collection for apartments in Greater Noida West. Transparent weighing, instant UPI payment, full traceability.",
       },
       { name: "author", content: "The Scrap Co." },
-      { property: "og:title", content: "The Scrap Co. — Smart Scrap Pickup" },
+      { name: "robots", content: "index, follow" },
+      // Open Graph
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://scrapco.in/" },
+      { property: "og:title", content: "The Scrap Co. — Smart Scrap Pickup in Greater Noida West" },
       {
         property: "og:description",
         content:
-          "Tech-enabled doorstep scrap collection for apartments in Greater Noida West.",
+          "Doorstep scrap pickup for apartments in Greater Noida West. Transparent digital weighing, instant UPI payment.",
       },
-      { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://scrapco.in/images/Screenshot-1.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:locale", content: "en_IN" },
+      // Twitter
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@thescrapcoin" },
       { name: "twitter:title", content: "The Scrap Co. — Smart Scrap Pickup" },
       {
         name: "twitter:description",
-        content:
-          "Tech-enabled doorstep scrap collection for apartments in Greater Noida West.",
+        content: "Doorstep scrap pickup for apartments in Greater Noida West.",
       },
-      { property: "og:image", content: "/images/Screenshot-1.png" },
-      { name: "twitter:image", content: "/images/Screenshot-1.png" },
+      { name: "twitter:image", content: "https://scrapco.in/images/Screenshot-1.png" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "canonical", href: "https://scrapco.in/" },
     ],
   }),
+  scripts: () => [
+    {
+      type: "application/ld+json",
+      children: JSON_LD_LOCAL_BUSINESS,
+    },
+  ],
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
