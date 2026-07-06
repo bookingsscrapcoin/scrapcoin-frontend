@@ -156,25 +156,7 @@ function Index() {
       <Toaster richColors position="top-center" />
 
       {/* Nav */}
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <a href="#top" aria-label="The Scrap Co. home">
-            <BrandLogo size={60} />
-          </a>
-          <div className="flex items-center gap-3">
-            <Link
-              to="/rates"
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors mr-3"
-            >
-              Check Rates
-            </Link>
-            <a href="#booking" className="hidden sm:block">
-              <Button size="sm" className="rounded-full">Schedule a Pickup</Button>
-            </a>
-            <NavAuth />
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero */}
       <section
