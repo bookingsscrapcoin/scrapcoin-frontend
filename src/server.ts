@@ -1,5 +1,62 @@
 import "./lib/error-capture";
 
+const SITE_URL = "https://scrapco.in";
+
+/** Serve robots.txt directly from the Worker — no SSR needed */
+function robotsTxtResponse(): Response {
+  const body = [
+    "User-agent: *",
+    "Allow: /",
+    "",
+    "Disallow: /admin/",
+    "Disallow: /erp/",
+    "Disallow: /my-bookings",
+    "Disallow: /login",
+    "Disallow: /register",
+    "",
+    `Sitemap: ${SITE_URL}/sitemap.xml`,
+  ].join("\n");
+  return new Response(body, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "public, max-age=86400",
+    },
+  });
+}
+
+/** Serve sitemap.xml directly from the Worker — no SSR needed */
+function sitemapXmlResponse(): Response {
+  const lastmod = new Date().toISOString().split("T")[0];
+  const pages = [
+    { path: "/",        priority: "1.0", changefreq: "weekly"  },
+    { path: "/about",   priority: "0.8", changefreq: "monthly" },
+    { path: "/rates",   priority: "0.9", changefreq: "weekly"  },
+    { path: "/faq",     priority: "0.8", changefreq: "monthly" },
+    { path: "/contact", priority: "0.8", changefreq: "monthly" },
+    { path: "/partner", priority: "0.7", changefreq: "monthly" },
+    { path: "/impact",  priority: "0.7", changefreq: "weekly"  },
+    { path: "/blog",    priority: "0.6", changefreq: "weekly"  },
+    { path: "/careers", priority: "0.6", changefreq: "monthly" },
+    { path: "/terms",   priority: "0.3", changefreq: "yearly"  },
+    { path: "/privacy", priority: "0.3", changefreq: "yearly"  },
+  ];
+  const urls = pages
+    .map(
+      ({ path, priority, changefreq }) =>
+        `  <url>\n    <loc>${SITE_URL}${path}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`,
+    )
+    .join("\n");
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`;
+  return new Response(xml, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/xml; charset=utf-8",
+      "Cache-Control": "public, max-age=3600",
+    },
+  });
+}
+
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -100,6 +157,11 @@ function applyResponseCacheHeaders(request: Request, response: Response): Respon
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    // Intercept special paths before passing to SSR handler
+    const { pathname } = new URL(request.url);
+    if (pathname === "/robots.txt") return robotsTxtResponse();
+    if (pathname === "/sitemap.xml") return sitemapXmlResponse();
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
@@ -111,3 +173,4 @@ export default {
     }
   },
 };
+
