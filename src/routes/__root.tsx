@@ -221,6 +221,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { name: "author", content: "The Scrap Co." },
       { name: "robots", content: "index, follow" },
+      { name: "google-site-verification", content: "R31npkH2HUW4zmf13jrTffEDFY0fbLuTPf46mJUli3o" },
       // Open Graph
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://scrapco.in/" },
