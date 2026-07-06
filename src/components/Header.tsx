@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
-import { NavAuth } from "../routes/__root";
+import { NavAuth } from "./nav-auth";
 import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
