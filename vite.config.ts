@@ -15,6 +15,23 @@ export default defineConfig({
     tailwindcss(),
     tsconfigPaths(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("@supabase")) {
+              return "supabase";
+            }
+            if (id.includes("recharts") || id.includes("d3-")) {
+              return "recharts-vendor";
+            }
+            return "vendor";
+          }
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     strictPort: false,

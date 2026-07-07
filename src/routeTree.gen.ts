@@ -111,67 +111,87 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/admin/index.lazy').then((d) => d.Route))
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/admin/users',
   path: '/admin/users',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/admin/users.lazy').then((d) => d.Route))
 const AdminErpRoute = AdminErpRouteImport.update({
   id: '/admin/erp',
   path: '/admin/erp',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/admin/erp.lazy').then((d) => d.Route))
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/admin/categories',
   path: '/admin/categories',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() =>
+  import('./routes/admin/categories.lazy').then((d) => d.Route),
+)
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
   id: '/admin/bookings',
   path: '/admin/bookings',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() =>
+  import('./routes/admin/bookings.lazy').then((d) => d.Route),
+)
 const AdminErpIndexRoute = AdminErpIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminErpRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/admin/erp/index.lazy').then((d) => d.Route),
+)
 const AdminErpWhatsappRoute = AdminErpWhatsappRouteImport.update({
   id: '/whatsapp',
   path: '/whatsapp',
   getParentRoute: () => AdminErpRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/admin/erp/whatsapp.lazy').then((d) => d.Route),
+)
 const AdminErpTransactionsRoute = AdminErpTransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
   getParentRoute: () => AdminErpRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/admin/erp/transactions.lazy').then((d) => d.Route),
+)
 const AdminErpSuppliersRoute = AdminErpSuppliersRouteImport.update({
   id: '/suppliers',
   path: '/suppliers',
   getParentRoute: () => AdminErpRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/admin/erp/suppliers.lazy').then((d) => d.Route),
+)
 const AdminErpReceiptsRoute = AdminErpReceiptsRouteImport.update({
   id: '/receipts',
   path: '/receipts',
   getParentRoute: () => AdminErpRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/admin/erp/receipts.lazy').then((d) => d.Route),
+)
 const AdminErpMaterialsRoute = AdminErpMaterialsRouteImport.update({
   id: '/materials',
   path: '/materials',
   getParentRoute: () => AdminErpRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/admin/erp/materials.lazy').then((d) => d.Route),
+)
 const AdminErpInvoicesRoute = AdminErpInvoicesRouteImport.update({
   id: '/invoices',
   path: '/invoices',
   getParentRoute: () => AdminErpRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/admin/erp/invoices.lazy').then((d) => d.Route),
+)
 const AdminErpCustomersRoute = AdminErpCustomersRouteImport.update({
   id: '/customers',
   path: '/customers',
   getParentRoute: () => AdminErpRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/admin/erp/customers.lazy').then((d) => d.Route),
+)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
