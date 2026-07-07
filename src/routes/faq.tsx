@@ -37,7 +37,7 @@ const FAQ_DATA: FAQSection[] = [
       },
       {
         q: "Which areas do you currently serve?",
-        a: "We currently serve Greater Noida, Indirapuram, and Noida. Start typing your society or sector name in the booking form — if we serve your locality, the form will accept it. We are expanding rapidly to other NCR zones soon.",
+        a: "We currently serve Greater Noida, Indirapuram, and Noida. We are expanding rapidly to other NCR zones soon.",
       },
       {
         q: "Is there a minimum weight quantity?",
