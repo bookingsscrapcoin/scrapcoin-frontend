@@ -67,7 +67,7 @@ function AboutPage() {
           <div className="rounded-2xl border border-border/60 bg-card p-6 space-y-3">
             <h3 className="text-base font-bold text-foreground">Our Vision</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              An India where no recyclable material goes to a landfill, where every society has a trusted recycling partner, and where recycling is a simple daily habit with instant, visible rewards.
+              India where no recyclable material goes to a landfill, where every society has a trusted recycling partner, and where recycling is a simple daily habit with instant, visible rewards.
             </p>
           </div>
         </div>
