@@ -33,7 +33,7 @@ const FAQ_DATA: FAQSection[] = [
     items: [
       {
         q: "How do I book a scrap pickup?",
-        a: "Fill in the booking form on our homepage — just enter your name, WhatsApp number, society/sector name, tower and flat number, preferred pickup date, and select the scrap categories you have. We will confirm your pickup slot via WhatsApp within 4 hours.",
+        a: "Fill in the booking form on our homepage — just enter your name, WhatsApp number, society/sector name, tower and flat number, preferred pickup date, and select the scrap categories you have. We will confirm your pickup slot via WhatsApp.",
       },
       {
         q: "Which areas do you currently serve?",

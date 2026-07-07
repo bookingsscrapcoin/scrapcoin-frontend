@@ -51,7 +51,7 @@ function AboutPage() {
               Based in Noida, The Scrap Co. is a tech-driven scrap collection service. We use calibrated digital scales, live market prices, and instant UPI payouts to make recycling **transparent, traceable, and trustworthy**.
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Every kilogram collected is logged and tracked to certified recycling processors. We help you make sure your recyclables actually get recycled.
+              Every kilogram collected is logged and tracked. We help you make sure your recyclables actually get recycled.
             </p>
           </div>
         </div>
@@ -61,7 +61,7 @@ function AboutPage() {
           <div className="rounded-2xl border border-border/60 bg-card p-6 space-y-3">
             <h3 className="text-base font-bold text-foreground">Our Mission</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Turn household waste into verified value — for residents, for apartment societies, and for the local environment.
+              Turn household scrap into verified value — for residents, for apartment societies, and for the local environment.
             </p>
           </div>
           <div className="rounded-2xl border border-border/60 bg-card p-6 space-y-3">
@@ -95,10 +95,6 @@ function AboutPage() {
                 <tr>
                   <td className="px-6 py-3.5">Cash only, no invoice or transaction record</td>
                   <td className="px-6 py-3.5 bg-primary/5 font-semibold text-foreground">Instant UPI payments + digital invoice receipt</td>
-                </tr>
-                <tr>
-                  <td className="px-6 py-3.5">No trace of where materials are dumped</td>
-                  <td className="px-6 py-3.5 bg-primary/5 font-semibold text-foreground">Channeled to CPCB-certified recycling partners</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-3.5">No pickup scheduling (wait for local calls)</td>

@@ -335,9 +335,9 @@ function Index() {
               <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">
                 <Building className="h-6 w-6" />
               </span>
-              <h3 className="mt-5 text-xl font-semibold">Works in 30+ Societies</h3>
+              <h3 className="mt-5 text-xl font-semibold">Apartment &amp; Society Pickup</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Serving Greater Noida, Noida Extension, Indirapuram, and more. Expanding weekly.
+                Serving residential apartments and societies across Noida, Greater Noida, and Indirapuram.
               </p>
             </div>
             

@@ -57,7 +57,7 @@ function TermsPage() {
           <h2 className="text-lg font-bold text-foreground mt-8">3. Booking and Scheduling</h2>
           <ul className="list-disc pl-5 space-y-1.5">
             <li>Bookings must be scheduled at least <strong>12 hours in advance</strong> of the requested pickup date.</li>
-            <li>We confirm your booking slot via WhatsApp within 4 hours of submission.</li>
+            <li>We confirm your booking slot via WhatsApp.</li>
             <li>Standard pickup hours are between <strong>9 AM and 6 PM, Monday to Saturday</strong>.</li>
             <li>Sunday or public holiday pickups are subject to availability.</li>
           </ul>
