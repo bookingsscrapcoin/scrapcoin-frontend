@@ -38,6 +38,7 @@ import { createBooking, fetchCircularImpact, type CircularImpact } from "@/lib/a
 import { NavAuth } from "./__root";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import * as Sentry from "@sentry/react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -132,6 +133,9 @@ function Index() {
       setDate(undefined);
       setMaterials([]);
     } catch (err) {
+      if (typeof window !== "undefined") {
+        Sentry.captureException(err);
+      }
       toast.error(
         err instanceof Error
           ? err.message

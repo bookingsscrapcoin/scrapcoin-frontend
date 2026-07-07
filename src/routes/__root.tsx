@@ -19,8 +19,28 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { LogOut } from "lucide-react";
+import * as Sentry from "@sentry/react";
 
 import appCss from "../styles.css?url";
+
+if (typeof window !== "undefined") {
+  const sentryDsn = import.meta.env.VITE_SENTRY_DSN || "";
+  if (sentryDsn) {
+    Sentry.init({
+      dsn: sentryDsn,
+      integrations: [
+        Sentry.browserTracingIntegration(),
+        Sentry.replayIntegration(),
+      ],
+      tracesSampleRate: 1.0,
+      tracePropagationTargets: ["localhost", /^https:\/\/api\.scrapco\.in/],
+      replaysSessionSampleRate: 0.1,
+      replaysOnErrorSampleRate: 1.0,
+    });
+  } else {
+    console.warn("Sentry DSN not found in environment variables. Error tracking is disabled.");
+  }
+}
 
 function NotFoundComponent() {
   return (
@@ -46,6 +66,9 @@ function NotFoundComponent() {
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
+  if (typeof window !== "undefined") {
+    Sentry.captureException(error);
+  }
   const router = useRouter();
 
   return (
