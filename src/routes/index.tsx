@@ -33,7 +33,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { BrandLogo } from "@/components/brand-logo";
-import { WhatsAppFAB, WhatsAppLink, WhatsAppIcon } from "@/components/whatsapp-button";
+import { WhatsAppFAB, WhatsAppLink } from "@/components/whatsapp-button";
 import { createBooking, fetchCircularImpact, type CircularImpact } from "@/lib/api";
 import { NavAuth } from "./__root";
 import { Header } from "@/components/Header";
@@ -433,22 +433,14 @@ function Index() {
               </div>
             </div>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <a
-                href={`https://wa.me/917292016625?text=${encodeURIComponent(
-                  `Hi The Scrap Co., I just scheduled a scrap pickup!\n\nHere are the details:\n- Name: ${bookingSuccessData.fullName}\n- WhatsApp: ${bookingSuccessData.phone}\n- Date: ${bookingSuccessData.pickupDate}\n- Address: ${bookingSuccessData.society}${bookingSuccessData.tower ? `, ${bookingSuccessData.tower}` : ""}\n- Materials: ${bookingSuccessData.materials.join(", ")}\n\nPlease confirm.`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 font-semibold text-white shadow-md hover:bg-emerald-600 transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 animate-pulse hover:animate-none"
-              >
-                <WhatsAppIcon className="h-5 w-5 fill-white" />
-                Send Details on WhatsApp
-              </a>
+            <p className="mt-6 text-xs text-muted-foreground">
+              A confirmation message has been automatically sent to your WhatsApp and SMS number.
+            </p>
+
+            <div className="mt-6 flex justify-center">
               <Button
-                variant="outline"
                 onClick={() => setBookingSuccessData(null)}
-                className="rounded-full h-12 px-6 cursor-pointer"
+                className="rounded-full h-12 px-8 cursor-pointer shadow-md"
               >
                 Schedule Another Pickup
               </Button>
