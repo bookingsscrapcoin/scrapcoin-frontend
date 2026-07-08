@@ -6,7 +6,7 @@ const WHATSAPP_MESSAGE = encodeURIComponent(
 );
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
 
-function WhatsAppIcon({ className }: { className?: string }) {
+export function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}

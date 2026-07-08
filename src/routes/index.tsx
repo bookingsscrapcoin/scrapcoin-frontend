@@ -33,7 +33,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { BrandLogo } from "@/components/brand-logo";
-import { WhatsAppFAB, WhatsAppLink } from "@/components/whatsapp-button";
+import { WhatsAppFAB, WhatsAppLink, WhatsAppIcon } from "@/components/whatsapp-button";
 import { createBooking, fetchCircularImpact, type CircularImpact } from "@/lib/api";
 import { NavAuth } from "./__root";
 import { Header } from "@/components/Header";
@@ -92,6 +92,15 @@ function Index() {
   const [materials, setMaterials] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [impact, setImpact] = useState<CircularImpact>(FALLBACK_IMPACT);
+  const [bookingSuccessData, setBookingSuccessData] = useState<{
+    fullName: string;
+    phone: string;
+    society: string;
+    tower?: string;
+    pickupDate: string;
+    materials: string[];
+  } | null>(null);
+
 
   useEffect(() => {
     fetchCircularImpact()
@@ -117,18 +126,20 @@ function Index() {
 
     setSubmitting(true);
     try {
+      const payload = {
+        fullName: String(data.get("fullName")),
+        phone: String(data.get("phone")),
+        society: String(data.get("society")),
+        tower: String(data.get("tower") || "") || undefined,
+        pickupDate: format(date, "yyyy-MM-dd"),
+        materials,
+      };
       const result = await createBooking(
-        {
-          fullName: String(data.get("fullName")),
-          phone: String(data.get("phone")),
-          society: String(data.get("society")),
-          tower: String(data.get("tower") || "") || undefined,
-          pickupDate: format(date, "yyyy-MM-dd"),
-          materials,
-        },
+        payload,
         session?.access_token ?? undefined,
       );
       toast.success(result.message);
+      setBookingSuccessData(payload);
       form.reset();
       setDate(undefined);
       setMaterials([]);
@@ -388,125 +399,182 @@ function Index() {
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          autoComplete="off"
-          className="mt-10 rounded-3xl border border-border/60 bg-card p-6 sm:p-10"
-          style={{ boxShadow: "var(--shadow-elegant)" }}
-        >
-          <div className="mb-6 text-left">
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-semibold text-primary">
-              ⚡ Quick booking — under 2 minutes. No account needed.
-            </span>
-          </div>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full name</Label>
-              <Input id="fullName" name="fullName" placeholder="Sai Shankar" required />
+        {bookingSuccessData ? (
+          <div
+            className="mt-10 rounded-3xl border border-emerald-500/30 bg-emerald-500/5 p-6 sm:p-10 text-center animate-in fade-in zoom-in-95 duration-300"
+            style={{ boxShadow: "var(--shadow-elegant)" }}
+          >
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
+              <CheckCircle2 className="h-10 w-10 animate-bounce" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">WhatsApp number</Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                inputMode="tel"
-                pattern="[0-9+ ]{10,15}"
-                placeholder="+91 98765 12345"
-                required
-              />
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="society">Apartment society / Sector</Label>
-              <Input
-                id="society"
-                name="society"
-                placeholder="e.g. Gaur City , Sector 16C, Greater Noida West"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tower">Tower & flat number</Label>
-              <Input id="tower" name="tower" placeholder="Tower B • Flat 1204" />
-            </div>
-            <div className="space-y-2">
-              <Label>Preferred pickup date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !date && "text-muted-foreground",
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                    disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                    className={cn("p-3 pointer-events-auto")}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div className="space-y-3 sm:col-span-2">
-              <Label>Material estimate</Label>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {MATERIALS.map((m) => {
-                  const active = materials.includes(m);
-                  return (
-                    <label
-                      key={m}
-                      className={cn(
-                        "flex cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm transition-all",
-                        active
-                          ? "border-primary bg-primary/5 text-foreground"
-                          : "border-border bg-background text-muted-foreground hover:border-primary/40",
-                      )}
-                    >
-                      <Checkbox
-                        checked={active}
-                        onCheckedChange={() => toggleMaterial(m)}
-                      />
-                      <span>{m}</span>
-                    </label>
-                  );
-                })}
+            <h3 className="mt-6 text-2xl font-bold text-foreground">Pickup Scheduled!</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Your scrap pickup has been scheduled successfully.
+            </p>
+
+            <div className="mt-8 rounded-2xl border border-border bg-card p-6 text-left max-w-md mx-auto space-y-3 text-xs sm:text-sm">
+              <div className="flex justify-between border-b border-border pb-2">
+                <span className="text-muted-foreground">Name:</span>
+                <span className="font-semibold">{bookingSuccessData.fullName}</span>
+              </div>
+              <div className="flex justify-between border-b border-border pb-2">
+                <span className="text-muted-foreground">Preferred Date:</span>
+                <span className="font-semibold">{bookingSuccessData.pickupDate}</span>
+              </div>
+              <div className="flex justify-between border-b border-border pb-2">
+                <span className="text-muted-foreground">Location:</span>
+                <span className="font-semibold text-right">
+                  {bookingSuccessData.tower ? `${bookingSuccessData.tower}, ` : ""}{bookingSuccessData.society}
+                </span>
+              </div>
+              <div className="flex justify-between pb-1">
+                <span className="text-muted-foreground">Materials:</span>
+                <span className="font-semibold text-right">{bookingSuccessData.materials.join(", ")}</span>
               </div>
             </div>
-          </div>
 
-          {materials.length > 0 && (
-            <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-center text-xs animate-in fade-in duration-200 text-foreground">
-              <p className="font-bold">
-                💰 Estimated payout: <span className="text-primary font-extrabold text-sm sm:text-base">₹{minEst} – ₹{maxEst}</span>
-              </p>
-              <p className="text-[10px] text-muted-foreground mt-1">
-                Based on current rates • Actual payout depends on exact weight measured at collection
-              </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <a
+                href={`https://wa.me/917292016625?text=${encodeURIComponent(
+                  `Hi The Scrap Co., I just scheduled a scrap pickup!\n\nHere are the details:\n- Name: ${bookingSuccessData.fullName}\n- WhatsApp: ${bookingSuccessData.phone}\n- Date: ${bookingSuccessData.pickupDate}\n- Address: ${bookingSuccessData.society}${bookingSuccessData.tower ? `, ${bookingSuccessData.tower}` : ""}\n- Materials: ${bookingSuccessData.materials.join(", ")}\n\nPlease confirm.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 font-semibold text-white shadow-md hover:bg-emerald-600 transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 animate-pulse hover:animate-none"
+              >
+                <WhatsAppIcon className="h-5 w-5 fill-white" />
+                Send Details on WhatsApp
+              </a>
+              <Button
+                variant="outline"
+                onClick={() => setBookingSuccessData(null)}
+                className="rounded-full h-12 px-6 cursor-pointer"
+              >
+                Schedule Another Pickup
+              </Button>
             </div>
-          )}
-
-          <Button
-            type="submit"
-            size="lg"
-            disabled={submitting}
-            className="mt-8 w-full rounded-full text-base shadow-lg cursor-pointer"
+          </div>
+        ) : (
+          <form
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            className="mt-10 rounded-3xl border border-border/60 bg-card p-6 sm:p-10"
+            style={{ boxShadow: "var(--shadow-elegant)" }}
           >
-            {submitting ? "Confirming..." : "Confirm Booking"}
-          </Button>
-          <p className="mt-3 text-center text-xs text-muted-foreground">
-            You'll receive a WhatsApp confirmation within 4 hours.
-          </p>
-        </form>
+            <div className="mb-6 text-left">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-semibold text-primary">
+                ⚡ Quick booking — under 2 minutes. No account needed.
+              </span>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Full name</Label>
+                <Input id="fullName" name="fullName" placeholder="Sai Shankar" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">WhatsApp number</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  inputMode="tel"
+                  pattern="[0-9+ ]{10,15}"
+                  placeholder="+91 98765 12345"
+                  required
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="society">Apartment society / Sector</Label>
+                <Input
+                  id="society"
+                  name="society"
+                  placeholder="e.g. Gaur City , Sector 16C, Greater Noida West"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tower">Tower & flat number</Label>
+                <Input id="tower" name="tower" placeholder="Tower B • Flat 1204" />
+              </div>
+              <div className="space-y-2">
+                <Label>Preferred pickup date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !date && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      initialFocus
+                      disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-3 sm:col-span-2">
+                <Label>Material estimate</Label>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {MATERIALS.map((m) => {
+                    const active = materials.includes(m);
+                    return (
+                      <label
+                        key={m}
+                        className={cn(
+                          "flex cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm transition-all",
+                          active
+                            ? "border-primary bg-primary/5 text-foreground"
+                            : "border-border bg-background text-muted-foreground hover:border-primary/40",
+                        )}
+                      >
+                        <Checkbox
+                          checked={active}
+                          onCheckedChange={() => toggleMaterial(m)}
+                        />
+                        <span>{m}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {materials.length > 0 && (
+              <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-center text-xs animate-in fade-in duration-200 text-foreground">
+                <p className="font-bold">
+                  💰 Estimated payout: <span className="text-primary font-extrabold text-sm sm:text-base">₹{minEst} – ₹{maxEst}</span>
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Based on current rates • Actual payout depends on exact weight measured at collection
+                </p>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              size="lg"
+              disabled={submitting}
+              className="mt-8 w-full rounded-full text-base shadow-lg cursor-pointer"
+            >
+              {submitting ? "Confirming..." : "Confirm Booking"}
+            </Button>
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              You'll receive a WhatsApp confirmation within 4 hours.
+            </p>
+          </form>
+        )}
       </section>
 
       {/* Testimonials Section */}
