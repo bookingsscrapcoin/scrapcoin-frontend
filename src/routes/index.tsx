@@ -101,6 +101,16 @@ function Index() {
     materials: string[];
   } | null>(null);
 
+  const adminPhone = "917292016625";
+  const bookingText = bookingSuccessData
+    ? `Hello, I just scheduled a scrap pickup on Scrapco.in:\n\n` +
+      `👤 *Name*: ${bookingSuccessData.fullName}\n` +
+      `📅 *Preferred Date*: ${bookingSuccessData.pickupDate}\n` +
+      `📍 *Address*: ${bookingSuccessData.tower ? `${bookingSuccessData.tower}, ` : ""}${bookingSuccessData.society}\n` +
+      `📦 *Materials*: ${bookingSuccessData.materials.join(", ")}`
+    : "";
+  const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(bookingText)}`;
+
 
   useEffect(() => {
     fetchCircularImpact()
@@ -434,15 +444,25 @@ function Index() {
             </div>
 
             <p className="mt-6 text-xs text-muted-foreground">
-              A confirmation message has been automatically sent to your WhatsApp and SMS number.
+              A confirmation message has been queued to your number. For instant scheduling, please share the details with our admin directly.
             </p>
 
-            <div className="mt-6 flex justify-center">
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-full h-12 px-6 bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold cursor-pointer shadow-md text-sm transition-all w-full sm:w-auto"
+              >
+                <MessageCircle className="h-5 w-5" />
+                Notify Admin on WhatsApp
+              </a>
               <Button
                 onClick={() => setBookingSuccessData(null)}
-                className="rounded-full h-12 px-8 cursor-pointer shadow-md"
+                variant="outline"
+                className="rounded-full h-12 px-8 cursor-pointer border-border hover:bg-accent text-sm w-full sm:w-auto"
               >
-                Schedule Another Pickup
+                Schedule Another
               </Button>
             </div>
           </div>
