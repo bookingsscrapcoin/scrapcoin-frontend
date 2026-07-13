@@ -26,6 +26,8 @@ import {
   Mail,
   MapPin,
   FileText,
+  MessageSquare,
+  Wallet,
 } from "lucide-react";
 import {
   Dialog,
@@ -58,6 +60,8 @@ function ERPSuppliersPage() {
   // Form states
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [upi, setUpi] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [idType, setIdType] = useState("Aadhaar");
@@ -86,6 +90,8 @@ function ERPSuppliersPage() {
     setEditingSupplier(null);
     setName("");
     setPhone("");
+    setWhatsapp("");
+    setUpi("");
     setEmail("");
     setAddress("");
     setIdType("Aadhaar");
@@ -97,6 +103,8 @@ function ERPSuppliersPage() {
     setEditingSupplier(s);
     setName(s.name);
     setPhone(s.phone || "");
+    setWhatsapp(s.whatsapp || "");
+    setUpi(s.upi || "");
     setEmail(s.email || "");
     setAddress(s.address || "");
     setIdType(s.id_type || "Aadhaar");
@@ -128,6 +136,8 @@ function ERPSuppliersPage() {
     const payload = {
       name: name.trim(),
       phone: phone.trim() || null,
+      whatsapp: whatsapp.trim() || null,
+      upi: upi.trim() || null,
       email: email.trim() || null,
       address: address.trim() || null,
       id_type: idType || null,
@@ -233,9 +243,28 @@ function ERPSuppliersPage() {
                   <tr key={s.id} className="hover:bg-muted/10 transition-colors">
                     <td className="px-6 py-4 font-semibold text-foreground">{s.name}</td>
                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
-                      <div className="flex flex-col gap-0.5">
-                        {s.phone && <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {s.phone}</span>}
-                        {s.email && <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {s.email}</span>}
+                      <div className="flex flex-col gap-1 text-[11px]">
+                        {s.phone && (
+                          <span className="flex items-center gap-1 text-foreground" title="Phone">
+                            <Phone className="h-3 w-3 text-muted-foreground" /> {s.phone}
+                          </span>
+                        )}
+                        {s.whatsapp && (
+                          <span className="flex items-center gap-1 text-emerald-600 font-medium" title="WhatsApp">
+                            <MessageSquare className="h-3 w-3 text-emerald-500" /> {s.whatsapp}
+                          </span>
+                        )}
+                        {s.upi && (
+                          <span className="flex items-center gap-1 text-indigo-650 font-medium" title="UPI Number">
+                            <Wallet className="h-3 w-3 text-indigo-500" /> {s.upi}
+                          </span>
+                        )}
+                        {s.email && (
+                          <span className="flex items-center gap-1 text-muted-foreground" title="Email">
+                            <Mail className="h-3 w-3" /> {s.email}
+                          </span>
+                        )}
+                        {!s.phone && !s.whatsapp && !s.upi && !s.email && "—"}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
@@ -319,12 +348,36 @@ function ERPSuppliersPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="sup-phone">WhatsApp Number</Label>
+                <Label htmlFor="sup-phone">Phone Number</Label>
                 <Input
                   id="sup-phone"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91 XXXXX XXXXX"
+                  placeholder="e.g. +91 98765 43210"
+                  className="rounded-xl border border-border"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="sup-whatsapp">WhatsApp Number</Label>
+                <Input
+                  id="sup-whatsapp"
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  placeholder="e.g. +91 98765 43210"
+                  className="rounded-xl border border-border"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="sup-upi">UPI Number / ID</Label>
+                <Input
+                  id="sup-upi"
+                  value={upi}
+                  onChange={(e) => setUpi(e.target.value)}
+                  placeholder="e.g. 9876543210@paytm"
                   className="rounded-xl border border-border"
                 />
               </div>
@@ -413,9 +466,11 @@ function ERPSuppliersPage() {
                   </Badge>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-muted-foreground mt-2">
-                  {selectedSupplier.phone && <span className="flex items-center gap-1"><Phone className="h-3 w-3 text-primary" /> {selectedSupplier.phone}</span>}
-                  {selectedSupplier.email && <span className="flex items-center gap-1"><Mail className="h-3 w-3 text-primary" /> {selectedSupplier.email}</span>}
-                  {selectedSupplier.address && <span className="col-span-2 flex items-start gap-1"><MapPin className="h-3 w-3 text-primary mt-0.5 shrink-0" /> {selectedSupplier.address}</span>}
+                  {selectedSupplier.phone && <span className="flex items-center gap-1"><Phone className="h-3 w-3 text-primary" /> Phone: {selectedSupplier.phone}</span>}
+                  {selectedSupplier.whatsapp && <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3 text-emerald-600" /> WhatsApp: {selectedSupplier.whatsapp}</span>}
+                  {selectedSupplier.upi && <span className="flex items-center gap-1"><Wallet className="h-3 w-3 text-indigo-600" /> UPI: {selectedSupplier.upi}</span>}
+                  {selectedSupplier.email && <span className="flex items-center gap-1"><Mail className="h-3 w-3 text-primary" /> Email: {selectedSupplier.email}</span>}
+                  {selectedSupplier.address && <span className="col-span-2 flex items-start gap-1 mt-1 border-t border-border/40 pt-1"><MapPin className="h-3 w-3 text-primary mt-0.5 shrink-0" /> {selectedSupplier.address}</span>}
                   {selectedSupplier.id_type && <span className="col-span-2 flex items-center gap-1"><FileText className="h-3 w-3 text-primary shrink-0" /> ID Verified — {selectedSupplier.id_type}: {selectedSupplier.id_number}</span>}
                 </div>
               </div>

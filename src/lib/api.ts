@@ -86,6 +86,8 @@ export type ERPSupplier = {
   id: string;
   name: string;
   phone?: string | null;
+  whatsapp?: string | null;
+  upi?: string | null;
   email?: string | null;
   address?: string | null;
   id_type?: string | null;
