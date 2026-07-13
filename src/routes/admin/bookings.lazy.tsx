@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/context/AuthContext";
+import { Trash2 } from "lucide-react";
 
 export const Route = createLazyFileRoute("/admin/bookings")({
   component: AdminBookings,
