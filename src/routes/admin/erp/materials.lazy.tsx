@@ -54,7 +54,7 @@ function ERPMaterialsPage() {
 
   // Form states
   const [name, setName] = useState("");
-  const [category, setCategory] = useState<"Ferrous" | "Non-Ferrous">("Ferrous");
+  const [category, setCategory] = useState("");
   const [unit, setUnit] = useState("kg");
   const [buyPrice, setBuyPrice] = useState(0);
   const [sellPrice, setSellPrice] = useState(0);
@@ -64,14 +64,13 @@ function ERPMaterialsPage() {
 
   useEffect(() => {
     loadMaterials();
-  }, [session, categoryFilter]);
+  }, [session]);
 
   async function loadMaterials() {
     if (!session?.access_token) return;
     setLoading(true);
     try {
-      const cat = categoryFilter === "All" ? undefined : categoryFilter;
-      const res = await fetchERPMaterials(session.access_token, cat);
+      const res = await fetchERPMaterials(session.access_token);
       if (res.success) {
         setMaterials(res.materials);
       }
@@ -82,14 +81,18 @@ function ERPMaterialsPage() {
     }
   }
 
-  const filtered = materials.filter((m) =>
-    m.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const categories = ["All", ...Array.from(new Set(materials.map((m) => m.category).filter(Boolean)))];
+
+  const filtered = materials.filter((m) => {
+    const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = categoryFilter === "All" || m.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
 
   function openCreate() {
     setEditingMaterial(null);
     setName("");
-    setCategory("Ferrous");
+    setCategory("");
     setUnit("kg");
     setBuyPrice(0);
     setSellPrice(0);
@@ -194,12 +197,12 @@ function ERPMaterialsPage() {
 
         {/* Category Toggles & Buttons */}
         <div className="flex gap-2 w-full sm:w-auto justify-end items-center">
-          <div className="flex rounded-lg border border-border bg-muted/40 p-0.5">
-            {["All", "Ferrous", "Non-Ferrous"].map((c) => (
+          <div className="flex rounded-lg border border-border bg-muted/40 p-0.5 max-w-[280px] sm:max-w-xs overflow-x-auto whitespace-nowrap scrollbar-none">
+            {categories.map((c) => (
               <button
                 key={c}
                 onClick={() => setCategoryFilter(c)}
-                className={`rounded-md px-2.5 py-1 text-xs font-medium cursor-pointer transition-all ${
+                className={`rounded-md px-2.5 py-1 text-xs font-medium cursor-pointer transition-all whitespace-nowrap ${
                   categoryFilter === c
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
@@ -350,15 +353,14 @@ function ERPMaterialsPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="mat-category">Category</Label>
-                <select
+                <Input
                   id="mat-category"
                   value={category}
-                  onChange={(e) => setCategory(e.target.value as any)}
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="Ferrous">Ferrous</option>
-                  <option value="Non-Ferrous">Non-Ferrous</option>
-                </select>
+                  onChange={(e) => setCategory(e.target.value)}
+                  placeholder="e.g. Ferrous, Paper, Plastics..."
+                  required
+                  className="rounded-xl border border-border"
+                />
               </div>
 
               <div className="space-y-1.5">

@@ -70,7 +70,7 @@ export async function fetchCircularImpact(): Promise<CircularImpact> {
 export type ERPMaterial = {
   id: string;
   name: string;
-  category: "Ferrous" | "Non-Ferrous";
+  category: string;
   unit: string;
   buy_price: number;
   sell_price: number;
