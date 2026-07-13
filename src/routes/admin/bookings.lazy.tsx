@@ -51,6 +51,7 @@ const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
 function AdminBookings() {
   const { user, profile, session, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const isAdmin = profile?.role === "admin";
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
@@ -151,6 +152,32 @@ useEffect(() => {
     }
   }
 
+  async function deleteBookingClick(id: string) {
+    if (!isAdmin) return;
+    const confirmed = window.confirm("Are you sure to permanently delete this booking");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/bookings/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session!.access_token}`,
+        },
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error ?? "Failed to delete booking");
+      }
+      setBookings((prev) => prev.filter((b) => b.id !== id));
+      if (selected?.id === id) {
+        setSelected(null);
+      }
+      toast.success("Booking permanently deleted");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete booking");
+    }
+  }
+
   const filtered = bookings
     .filter((b) => filter === "all" || b.status === filter)
     .filter((b) => {
@@ -212,6 +239,11 @@ useEffect(() => {
                         </th>
                       )
                     )}
+                    {isAdmin && (
+                      <th className="px-4 py-3 font-medium whitespace-nowrap text-right">
+                        Actions
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -252,6 +284,19 @@ useEffect(() => {
                             {s.label}
                           </Badge>
                         </td>
+                        {isAdmin && (
+                          <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteBookingClick(b.id)}
+                              className="h-7 w-7 rounded-lg text-red-500 hover:text-red-650 hover:bg-red-50 cursor-pointer"
+                              title="Delete Booking"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </td>
+                        )}
                       </tr>
                     );
                   })}
@@ -485,6 +530,20 @@ useEffect(() => {
                         </div>
                       ))}
                     </div>
+                  </div>
+                )}
+
+                {isAdmin && (
+                  <div className="pt-4 border-t border-border flex justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deleteBookingClick(selected.id)}
+                      className="rounded-xl border-red-200 text-red-500 hover:bg-red-50 hover:text-red-605 cursor-pointer gap-1.5"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete Booking
+                    </Button>
                   </div>
                 )}
               </div>
