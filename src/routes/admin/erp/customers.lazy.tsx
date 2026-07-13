@@ -25,6 +25,8 @@ import {
   Phone,
   MapPin,
   FileText,
+  MessageSquare,
+  Wallet,
 } from "lucide-react";
 import {
   Dialog,
@@ -57,6 +59,8 @@ function ERPCustomersPage() {
   // Form states
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [upi, setUpi] = useState("");
   const [address, setAddress] = useState("");
   const [idType, setIdType] = useState("Aadhaar");
   const [idNumber, setIdNumber] = useState("");
@@ -85,6 +89,8 @@ function ERPCustomersPage() {
     setEditingCustomer(null);
     setName("");
     setPhone("");
+    setWhatsapp("");
+    setUpi("");
     setAddress("");
     setIdType("Aadhaar");
     setIdNumber("");
@@ -96,6 +102,8 @@ function ERPCustomersPage() {
     setEditingCustomer(c);
     setName(c.name);
     setPhone(c.phone || "");
+    setWhatsapp(c.whatsapp || "");
+    setUpi(c.upi || "");
     setAddress(c.address || "");
     setIdType(c.id_type || "Aadhaar");
     setIdNumber(c.id_number || "");
@@ -127,6 +135,8 @@ function ERPCustomersPage() {
     const payload = {
       name: name.trim(),
       phone: phone.trim() || null,
+      whatsapp: whatsapp.trim() || null,
+      upi: upi.trim() || null,
       address: address.trim() || null,
       id_type: idType || null,
       id_number: idNumber.trim() || null,
@@ -241,11 +251,24 @@ function ERPCustomersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
-                      {c.phone ? (
-                        <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {c.phone}</span>
-                      ) : (
-                        "—"
-                      )}
+                      <div className="flex flex-col gap-1 text-[11px]">
+                        {c.phone && (
+                          <span className="flex items-center gap-1 text-foreground" title="Phone">
+                            <Phone className="h-3 w-3 text-muted-foreground" /> {c.phone}
+                          </span>
+                        )}
+                        {c.whatsapp && (
+                          <span className="flex items-center gap-1 text-emerald-600 font-medium" title="WhatsApp">
+                            <MessageSquare className="h-3 w-3 text-emerald-500" /> {c.whatsapp}
+                          </span>
+                        )}
+                        {c.upi && (
+                          <span className="flex items-center gap-1 text-indigo-600 font-medium" title="UPI Number">
+                            <Wallet className="h-3 w-3 text-indigo-500" /> {c.upi}
+                          </span>
+                        )}
+                        {!c.phone && !c.whatsapp && !c.upi && "—"}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
                       {c.id_type ? (
@@ -328,12 +351,36 @@ function ERPCustomersPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="cust-phone">WhatsApp/Phone</Label>
+                <Label htmlFor="cust-phone">Phone Number</Label>
                 <Input
                   id="cust-phone"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91 XXXXX XXXXX"
+                  placeholder="e.g. +91 98765 43210"
+                  className="rounded-xl border border-border"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="cust-whatsapp">WhatsApp Number</Label>
+                <Input
+                  id="cust-whatsapp"
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  placeholder="e.g. +91 98765 43210"
+                  className="rounded-xl border border-border"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="cust-upi">UPI Number / ID</Label>
+                <Input
+                  id="cust-upi"
+                  value={upi}
+                  onChange={(e) => setUpi(e.target.value)}
+                  placeholder="e.g. 9876543210@paytm"
                   className="rounded-xl border border-border"
                 />
               </div>
@@ -421,8 +468,10 @@ function ERPCustomersPage() {
                   </Badge>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-muted-foreground mt-2">
-                  {selectedCustomer.phone && <span className="flex items-center gap-1"><Phone className="h-3 w-3 text-primary" /> {selectedCustomer.phone}</span>}
-                  {selectedCustomer.address && <span className="col-span-2 flex items-start gap-1"><MapPin className="h-3 w-3 text-primary mt-0.5 shrink-0" /> {selectedCustomer.address}</span>}
+                  {selectedCustomer.phone && <span className="flex items-center gap-1"><Phone className="h-3 w-3 text-primary" /> Phone: {selectedCustomer.phone}</span>}
+                  {selectedCustomer.whatsapp && <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3 text-emerald-600" /> WhatsApp: {selectedCustomer.whatsapp}</span>}
+                  {selectedCustomer.upi && <span className="flex items-center gap-1"><Wallet className="h-3 w-3 text-indigo-600" /> UPI: {selectedCustomer.upi}</span>}
+                  {selectedCustomer.address && <span className="col-span-2 flex items-start gap-1 mt-1 border-t border-border/40 pt-1"><MapPin className="h-3 w-3 text-primary mt-0.5 shrink-0" /> {selectedCustomer.address}</span>}
                   {selectedCustomer.id_type && <span className="col-span-2 flex items-center gap-1"><FileText className="h-3 w-3 text-primary shrink-0" /> ID verified — {selectedCustomer.id_type}: {selectedCustomer.id_number}</span>}
                 </div>
               </div>

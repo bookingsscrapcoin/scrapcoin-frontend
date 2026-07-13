@@ -101,6 +101,8 @@ export type ERPCustomer = {
   id: string;
   name: string;
   phone?: string | null;
+  whatsapp?: string | null;
+  upi?: string | null;
   address?: string | null;
   id_type?: string | null;
   id_number?: string | null;
