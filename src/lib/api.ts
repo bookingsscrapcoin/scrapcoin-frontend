@@ -389,6 +389,13 @@ export async function createERPPurchaseReceipt(payload: any, token?: string): Pr
   });
 }
 
+export async function updateERPPurchaseReceipt(receiptId: string, payload: any, token?: string): Promise<{ success: boolean; receipt: ERPPurchaseReceipt }> {
+  return authFetch(`${API_BASE}/api/erp/purchase-receipts/${receiptId}`, token, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function deleteERPPurchaseReceipt(receiptId: string, token?: string): Promise<{ success: boolean; message: string }> {
   return authFetch(`${API_BASE}/api/erp/purchase-receipts/${receiptId}`, token, {
     method: "DELETE",

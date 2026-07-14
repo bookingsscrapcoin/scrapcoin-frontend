@@ -6,6 +6,7 @@ import {
   fetchERPMaterials,
   fetchERPCustomers,
   createERPPurchaseReceipt,
+  updateERPPurchaseReceipt,
   deleteERPPurchaseReceipt,
   type ERPPurchaseReceipt,
   type ERPMaterial,
@@ -24,6 +25,7 @@ import {
   Printer,
   RotateCw,
   Scale,
+  Edit2,
 } from "lucide-react";
 import {
   Dialog,
@@ -159,6 +161,8 @@ function ERPReceiptsPage() {
   const [price, setPrice] = useState<number | "">("");
   const [payMethod, setPayMethod] = useState("cash");
   const [notes, setNotes] = useState("");
+  const [date, setDate] = useState("");
+  const [editingReceipt, setEditingReceipt] = useState<ERPPurchaseReceipt | null>(null);
 
   useEffect(() => {
     loadReceipts();
@@ -201,12 +205,26 @@ function ERPReceiptsPage() {
   }
 
   function openCreate() {
+    setEditingReceipt(null);
     setCustomerId("");
     setMaterialId("");
     setWeight("");
     setPrice("");
     setPayMethod("cash");
     setNotes("");
+    setDate(new Date().toISOString().split("T")[0]);
+    setDialogOpen(true);
+  }
+
+  function openEdit(r: ERPPurchaseReceipt) {
+    setEditingReceipt(r);
+    setCustomerId(r.customer_id || "");
+    setMaterialId(r.material_id);
+    setWeight(r.weight);
+    setPrice(r.price_per_unit);
+    setPayMethod(r.payment_method);
+    setNotes(r.notes || "");
+    setDate(new Date(r.created_at).toISOString().split("T")[0]);
     setDialogOpen(true);
   }
 
@@ -225,13 +243,23 @@ function ERPReceiptsPage() {
         price_per_unit: Number(price),
         payment_method: payMethod,
         notes: notes.trim() || null,
+        created_at: date ? new Date(date).toISOString() : null,
       };
 
-      const res = await createERPPurchaseReceipt(payload, session?.access_token);
-      if (res.success) {
-        toast.success("B2C Pickup receipt recorded successfully!");
-        setDialogOpen(false);
-        loadReceipts();
+      if (editingReceipt) {
+        const res = await updateERPPurchaseReceipt(editingReceipt.id, payload, session?.access_token);
+        if (res.success) {
+          toast.success("B2C Pickup receipt updated successfully!");
+          setDialogOpen(false);
+          loadReceipts();
+        }
+      } else {
+        const res = await createERPPurchaseReceipt(payload, session?.access_token);
+        if (res.success) {
+          toast.success("B2C Pickup receipt recorded successfully!");
+          setDialogOpen(false);
+          loadReceipts();
+        }
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to save scale receipt");
@@ -356,6 +384,15 @@ function ERPReceiptsPage() {
                         >
                           <Printer className="h-4 w-4" />
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openEdit(r)}
+                          className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground cursor-pointer"
+                          title="Edit Scale Receipt"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
                         {isAdmin && (
                           <Button
                             variant="ghost"
@@ -389,26 +426,40 @@ function ERPReceiptsPage() {
         <DialogContent className="max-w-md bg-card rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
-              <Scale className="h-5 w-5 text-primary" /> Log B2C Scale Collection Receipt
+              <Scale className="h-5 w-5 text-primary" /> {editingReceipt ? "Edit B2C Scale Collection Receipt" : "Log B2C Scale Collection Receipt"}
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="rec-cust">Household Customer (Optional)</Label>
-              <select
-                id="rec-cust"
-                value={customerId}
-                onChange={(e) => setCustomerId(e.target.value)}
-                className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
-              >
-                <option value="">Walk-in Customer (Unregistered)</option>
-                {customers.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} ({c.phone || "No phone"})
-                  </option>
-                ))}
-              </select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="rec-cust">Household Customer (Optional)</Label>
+                <select
+                  id="rec-cust"
+                  value={customerId}
+                  onChange={(e) => setCustomerId(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="">Walk-in Customer (Unregistered)</option>
+                  {customers.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} ({c.phone || "No phone"})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="rec-date">Collection Date</Label>
+                <Input
+                  id="rec-date"
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  required
+                  className="rounded-xl border border-border"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">
@@ -498,7 +549,7 @@ function ERPReceiptsPage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={submitting} className="rounded-xl cursor-pointer">
-                {submitting ? "Saving Receipt..." : "Record Scale Collection"}
+                {submitting ? "Saving Receipt..." : editingReceipt ? "Update Scale Collection" : "Record Scale Collection"}
               </Button>
             </DialogFooter>
           </form>
