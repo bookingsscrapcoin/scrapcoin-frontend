@@ -156,13 +156,37 @@ function ERPReceiptsPage() {
 
   // Form states
   const [customerId, setCustomerId] = useState("");
-  const [materialId, setMaterialId] = useState("");
-  const [weight, setWeight] = useState<number | "">("");
-  const [price, setPrice] = useState<number | "">("");
   const [payMethod, setPayMethod] = useState("cash");
   const [notes, setNotes] = useState("");
   const [date, setDate] = useState("");
   const [editingReceipt, setEditingReceipt] = useState<ERPPurchaseReceipt | null>(null);
+
+  type ReceiptItem = {
+    materialId: string;
+    weight: number | "";
+    price: number | "";
+  };
+  const [items, setItems] = useState<ReceiptItem[]>([{ materialId: "", weight: "", price: "" }]);
+
+  const handleItemChange = (index: number, key: keyof ReceiptItem, val: any) => {
+    const newItems = [...items];
+    if (key === "materialId") {
+      newItems[index].materialId = val;
+      const selected = materials.find((m) => m.id === val);
+      newItems[index].price = selected ? selected.buy_price : "";
+    } else {
+      newItems[index][key] = val;
+    }
+    setItems(newItems);
+  };
+
+  const addItemRow = () => {
+    setItems([...items, { materialId: "", weight: "", price: "" }]);
+  };
+
+  const removeItemRow = (index: number) => {
+    setItems(items.filter((_, idx) => idx !== index));
+  };
 
   useEffect(() => {
     loadReceipts();
@@ -178,16 +202,6 @@ function ERPReceiptsPage() {
       });
     }
   }, [dialogOpen, session]);
-
-  // Autodetect rate when material changes
-  useEffect(() => {
-    if (materialId) {
-      const selected = materials.find((m) => m.id === materialId);
-      if (selected) {
-        setPrice(selected.buy_price);
-      }
-    }
-  }, [materialId, materials]);
 
   async function loadReceipts() {
     if (!session?.access_token) return;
@@ -207,9 +221,7 @@ function ERPReceiptsPage() {
   function openCreate() {
     setEditingReceipt(null);
     setCustomerId("");
-    setMaterialId("");
-    setWeight("");
-    setPrice("");
+    setItems([{ materialId: "", weight: "", price: "" }]);
     setPayMethod("cash");
     setNotes("");
     setDate(new Date().toISOString().split("T")[0]);
@@ -219,31 +231,52 @@ function ERPReceiptsPage() {
   function openEdit(r: ERPPurchaseReceipt) {
     setEditingReceipt(r);
     setCustomerId(r.customer_id || "");
-    setMaterialId(r.material_id);
-    setWeight(r.weight);
-    setPrice(r.price_per_unit);
     setPayMethod(r.payment_method);
     setNotes(r.notes || "");
     setDate(new Date(r.created_at).toISOString().split("T")[0]);
+
+    // Find siblings (all parts of the same multi-material receipt)
+    const baseNumber = r.receipt_number.split("/")[0];
+    const siblings = receipts.filter(
+      (item) => item.receipt_number.split("/")[0] === baseNumber
+    );
+
+    if (siblings.length > 0) {
+      setItems(
+        siblings.map((sib) => ({
+          materialId: sib.material_id,
+          weight: sib.weight,
+          price: sib.price_per_unit,
+        }))
+      );
+    } else {
+      setItems([{ materialId: r.material_id, weight: r.weight, price: r.price_per_unit }]);
+    }
     setDialogOpen(true);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!materialId) return toast.error("Material selection is required");
-    if (!weight || Number(weight) <= 0) return toast.error("Please enter weighed weight");
-    if (price === "" || Number(price) <= 0) return toast.error("Please enter buying rate");
+    if (items.length === 0) return toast.error("At least one material item is required");
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (!item.materialId) return toast.error(`Material selection is required for item #${i + 1}`);
+      if (!item.weight || Number(item.weight) <= 0) return toast.error(`Please enter valid weight for item #${i + 1}`);
+      if (item.price === "" || Number(item.price) < 0) return toast.error(`Please enter valid buying rate for item #${i + 1}`);
+    }
 
     setSubmitting(true);
     try {
       const payload = {
         customer_id: customerId || null,
-        material_id: materialId,
-        weight: Number(weight),
-        price_per_unit: Number(price),
         payment_method: payMethod,
         notes: notes.trim() || null,
         created_at: date ? new Date(date).toISOString() : null,
+        items: items.map((item) => ({
+          material_id: item.materialId,
+          weight: Number(item.weight),
+          price_per_unit: Number(item.price),
+        })),
       };
 
       if (editingReceipt) {
@@ -281,7 +314,7 @@ function ERPReceiptsPage() {
     }
   }
 
-  const calcTotal = Number(weight || 0) * Number(price || 0);
+  const calcTotal = items.reduce((acc, curr) => acc + (Number(curr.weight || 0) * Number(curr.price || 0)), 0);
 
   const filtered = receipts.filter(
     (r) =>
@@ -423,7 +456,7 @@ function ERPReceiptsPage() {
 
       {/* weigh ticket entry dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md bg-card rounded-2xl">
+        <DialogContent className="max-w-2xl bg-card rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
               <Scale className="h-5 w-5 text-primary" /> {editingReceipt ? "Edit B2C Scale Collection Receipt" : "Log B2C Scale Collection Receipt"}
@@ -462,51 +495,74 @@ function ERPReceiptsPage() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="rec-material">Material Collected</Label>
-              <select
-                id="rec-material"
-                value={materialId}
-                onChange={(e) => setMaterialId(e.target.value)}
-                required
-                className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
-              >
-                <option value="">Select Material...</option>
-                {materials.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name} (Buying: ₹{m.buy_price})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="rec-weight">Collected Weight (kg)</Label>
-                <Input
-                  id="rec-weight"
-                  type="number"
-                  step="0.001"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value !== "" ? Number(e.target.value) : "")}
-                  placeholder="0.000"
-                  required
-                  className="rounded-xl border border-border"
-                />
+            {/* Materials List */}
+            <div className="space-y-3 pt-2">
+              <div className="flex justify-between items-center">
+                <Label className="font-bold text-xs text-foreground">Materials Collected</Label>
+                <Button type="button" size="sm" variant="outline" onClick={addItemRow} className="text-[10px] h-6 px-2 rounded-lg cursor-pointer">
+                  + Add Item
+                </Button>
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="rec-price">Buying Rate (₹/kg)</Label>
-                <Input
-                  id="rec-price"
-                  type="number"
-                  step="0.01"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value !== "" ? Number(e.target.value) : "")}
-                  placeholder="₹ 0.00"
-                  required
-                  className="rounded-xl border border-border"
-                />
+              <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+                {items.map((item, idx) => (
+                  <div key={idx} className="flex gap-2 items-end border border-border/40 rounded-xl p-3 bg-muted/5 relative">
+                    <div className="flex-1 space-y-1">
+                      <Label className="text-[10px]">Material</Label>
+                      <select
+                        value={item.materialId}
+                        onChange={(e) => handleItemChange(idx, "materialId", e.target.value)}
+                        required
+                        className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary"
+                      >
+                        <option value="">Select Material...</option>
+                        {materials.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.name} (₹{m.buy_price})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="w-28 space-y-1">
+                      <Label className="text-[10px]">Weight (kg)</Label>
+                      <Input
+                        type="number"
+                        step="0.001"
+                        value={item.weight}
+                        onChange={(e) => handleItemChange(idx, "weight", e.target.value !== "" ? Number(e.target.value) : "")}
+                        placeholder="0.000"
+                        required
+                        className="rounded-lg h-8 py-1 text-[11px]"
+                      />
+                    </div>
+
+                    <div className="w-28 space-y-1">
+                      <Label className="text-[10px]">Buying Rate</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={item.price}
+                        onChange={(e) => handleItemChange(idx, "price", e.target.value !== "" ? Number(e.target.value) : "")}
+                        placeholder="₹ 0.00"
+                        required
+                        className="rounded-lg h-8 py-1 text-[11px]"
+                      />
+                    </div>
+
+                    {items.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeItemRow(idx)}
+                        className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 

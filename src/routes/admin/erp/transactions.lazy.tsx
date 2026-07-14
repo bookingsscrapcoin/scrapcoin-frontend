@@ -204,14 +204,38 @@ function ERPTransactionsPage() {
 
   // Form states
   const [supplierId, setSupplierId] = useState("");
-  const [materialId, setMaterialId] = useState("");
-  const [weight, setWeight] = useState<number | "">("");
-  const [price, setPrice] = useState<number | "">("");
-  const [gstRate, setGstRate] = useState<number>(0);
   const [notes, setNotes] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [immediatePayment, setImmediatePayment] = useState(true);
   const [payMethod, setPayMethod] = useState("cash");
+
+  type TransactionItem = {
+    materialId: string;
+    weight: number | "";
+    price: number | "";
+    gstRate: number;
+  };
+  const [items, setItems] = useState<TransactionItem[]>([{ materialId: "", weight: "", price: "", gstRate: 0 }]);
+
+  const handleItemChange = (index: number, key: keyof TransactionItem, val: any) => {
+    const newItems = [...items];
+    if (key === "materialId") {
+      newItems[index].materialId = val;
+      const selected = materials.find((m) => m.id === val);
+      newItems[index].price = selected ? selected.buy_price : "";
+    } else {
+      newItems[index][key] = val;
+    }
+    setItems(newItems);
+  };
+
+  const addItemRow = () => {
+    setItems([...items, { materialId: "", weight: "", price: "", gstRate: 0 }]);
+  };
+
+  const removeItemRow = (index: number) => {
+    setItems(items.filter((_, idx) => idx !== index));
+  };
 
   useEffect(() => {
     loadTransactions();
@@ -228,16 +252,6 @@ function ERPTransactionsPage() {
       });
     }
   }, [dialogOpen, session]);
-
-  // Autodetect rate when material changes
-  useEffect(() => {
-    if (materialId) {
-      const selected = materials.find((m) => m.id === materialId);
-      if (selected) {
-        setPrice(selected.buy_price);
-      }
-    }
-  }, [materialId, materials]);
 
   async function loadTransactions() {
     if (!session?.access_token) return;
@@ -258,10 +272,7 @@ function ERPTransactionsPage() {
 
   function openCreate() {
     setSupplierId("");
-    setMaterialId("");
-    setWeight("");
-    setPrice("");
-    setGstRate(0);
+    setItems([{ materialId: "", weight: "", price: "", gstRate: 0 }]);
     setNotes("");
     setDueDate("");
     setImmediatePayment(true);
@@ -272,26 +283,32 @@ function ERPTransactionsPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!supplierId) return toast.error("Supplier selection is required");
-    if (!materialId) return toast.error("Material selection is required");
-    if (!weight || Number(weight) <= 0) return toast.error("Please enter a valid weight");
-    if (price === "" || Number(price) < 0) return toast.error("Please enter a valid purchase rate");
+    if (items.length === 0) return toast.error("At least one material item is required");
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (!item.materialId) return toast.error(`Material selection is required for item #${i + 1}`);
+      if (!item.weight || Number(item.weight) <= 0) return toast.error(`Please enter valid weight for item #${i + 1}`);
+      if (item.price === "" || Number(item.price) < 0) return toast.error(`Please enter valid purchase rate for item #${i + 1}`);
+    }
 
     setSubmitting(true);
     try {
       const payload = {
         supplier_id: supplierId,
-        material_id: materialId,
-        weight: Number(weight),
-        price_per_unit: Number(price),
-        gst_rate: Number(gstRate),
         notes: notes.trim() || null,
         due_date: immediatePayment ? null : dueDate || null,
         payment_method: immediatePayment ? payMethod : null,
+        items: items.map((item) => ({
+          material_id: item.materialId,
+          weight: Number(item.weight),
+          price_per_unit: Number(item.price),
+          gst_rate: Number(item.gstRate),
+        })),
       };
 
       const res = await createERPTransaction(payload, session?.access_token);
       if (res.success) {
-        toast.success("Scale transaction recorded successfully!");
+        toast.success("Scale transaction(s) recorded successfully!");
         setDialogOpen(false);
         loadTransactions();
       }
@@ -327,8 +344,8 @@ function ERPTransactionsPage() {
   }
 
   // Live calculator figures
-  const calcSubtotal = Number(weight || 0) * Number(price || 0);
-  const calcGst = (calcSubtotal * gstRate) / 100;
+  const calcSubtotal = items.reduce((acc, curr) => acc + (Number(curr.weight || 0) * Number(curr.price || 0)), 0);
+  const calcGst = items.reduce((acc, curr) => acc + ((Number(curr.weight || 0) * Number(curr.price || 0) * Number(curr.gstRate || 0)) / 100), 0);
   const calcTotal = calcSubtotal + calcGst;
 
   return (
@@ -476,7 +493,7 @@ function ERPTransactionsPage() {
 
       {/* Weigh Ticket Entry Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg bg-card rounded-2xl">
+        <DialogContent className="max-w-2xl bg-card rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
               <Scale className="h-5 w-5 text-primary" /> Log Scale Weigh Entry (B2B)
@@ -484,86 +501,106 @@ function ERPTransactionsPage() {
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="txn-supplier">Supplier Partner</Label>
-                <select
-                  id="txn-supplier"
-                  value={supplierId}
-                  onChange={(e) => setSupplierId(e.target.value)}
-                  required
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="">Select Supplier...</option>
-                  {suppliers.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="txn-material">Material Code</Label>
-                <select
-                  id="txn-material"
-                  value={materialId}
-                  onChange={(e) => setMaterialId(e.target.value)}
-                  required
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="">Select Material...</option>
-                  {materials.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="txn-supplier">Supplier Partner</Label>
+              <select
+                id="txn-supplier"
+                value={supplierId}
+                onChange={(e) => setSupplierId(e.target.value)}
+                required
+                className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
+              >
+                <option value="">Select Supplier...</option>
+                {suppliers.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="txn-weight">Weighed Weight (kg)</Label>
-                <Input
-                  id="txn-weight"
-                  type="number"
-                  step="0.001"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value !== "" ? Number(e.target.value) : "")}
-                  placeholder="0.000"
-                  required
-                  className="rounded-xl border border-border"
-                />
+            {/* Materials List */}
+            <div className="space-y-3 pt-2">
+              <div className="flex justify-between items-center">
+                <Label className="font-bold text-xs text-foreground">Material Items</Label>
+                <Button type="button" size="sm" variant="outline" onClick={addItemRow} className="text-[10px] h-6 px-2 rounded-lg cursor-pointer">
+                  + Add Item
+                </Button>
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="txn-price">Purchase Rate (₹/kg)</Label>
-                <Input
-                  id="txn-price"
-                  type="number"
-                  step="0.01"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value !== "" ? Number(e.target.value) : "")}
-                  placeholder="₹ 0.00"
-                  required
-                  className="rounded-xl border border-border"
-                />
-              </div>
+              <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+                {items.map((item, idx) => (
+                  <div key={idx} className="flex gap-2 items-end border border-border/40 rounded-xl p-3 bg-muted/5 relative">
+                    <div className="flex-1 space-y-1">
+                      <Label className="text-[10px]">Material</Label>
+                      <select
+                        value={item.materialId}
+                        onChange={(e) => handleItemChange(idx, "materialId", e.target.value)}
+                        required
+                        className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-primary"
+                      >
+                        <option value="">Select Material...</option>
+                        {materials.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="txn-gst">GST Rate (%)</Label>
-                <select
-                  id="txn-gst"
-                  value={gstRate}
-                  onChange={(e) => setGstRate(Number(e.target.value))}
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value={0}>0%</option>
-                  <option value={5}>5%</option>
-                  <option value={12}>12%</option>
-                  <option value={18}>18%</option>
-                </select>
+                    <div className="w-24 space-y-1">
+                      <Label className="text-[10px]">Weight (kg)</Label>
+                      <Input
+                        type="number"
+                        step="0.001"
+                        value={item.weight}
+                        onChange={(e) => handleItemChange(idx, "weight", e.target.value !== "" ? Number(e.target.value) : "")}
+                        placeholder="0.000"
+                        required
+                        className="rounded-lg h-8 py-1 text-[11px]"
+                      />
+                    </div>
+
+                    <div className="w-24 space-y-1">
+                      <Label className="text-[10px]">Rate (₹/kg)</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={item.price}
+                        onChange={(e) => handleItemChange(idx, "price", e.target.value !== "" ? Number(e.target.value) : "")}
+                        placeholder="₹ 0.00"
+                        required
+                        className="rounded-lg h-8 py-1 text-[11px]"
+                      />
+                    </div>
+
+                    <div className="w-20 space-y-1">
+                      <Label className="text-[10px]">GST (%)</Label>
+                      <select
+                        value={item.gstRate}
+                        onChange={(e) => handleItemChange(idx, "gstRate", Number(e.target.value))}
+                        className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-[11px] focus:outline-none"
+                      >
+                        <option value={0}>0%</option>
+                        <option value={5}>5%</option>
+                        <option value={12}>12%</option>
+                        <option value={18}>18%</option>
+                      </select>
+                    </div>
+
+                    {items.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeItemRow(idx)}
+                        className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -573,7 +610,7 @@ function ERPTransactionsPage() {
                 <span>₹ {calcSubtotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>GST ({gstRate}%):</span>
+                <span>GST:</span>
                 <span>₹ {calcGst.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="border-t border-border pt-2 flex justify-between text-sm font-bold text-foreground">
