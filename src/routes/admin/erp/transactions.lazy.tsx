@@ -6,6 +6,7 @@ import {
   fetchERPMaterials,
   fetchERPSuppliers,
   createERPTransaction,
+  updateERPTransaction,
   deleteERPTransaction,
   sendERPWhatsApp,
   type ERPTransaction,
@@ -27,6 +28,7 @@ import {
   RotateCw,
   Scale,
   Calendar,
+  Edit2,
 } from "lucide-react";
 import {
   Dialog,
@@ -208,6 +210,8 @@ function ERPTransactionsPage() {
   const [dueDate, setDueDate] = useState("");
   const [immediatePayment, setImmediatePayment] = useState(true);
   const [payMethod, setPayMethod] = useState("cash");
+  const [date, setDate] = useState("");
+  const [editingTransaction, setEditingTransaction] = useState<ERPTransaction | null>(null);
 
   type TransactionItem = {
     materialId: string;
@@ -271,12 +275,51 @@ function ERPTransactionsPage() {
   }
 
   function openCreate() {
+    setEditingTransaction(null);
     setSupplierId("");
     setItems([{ materialId: "", weight: "", price: "", gstRate: 0 }]);
     setNotes("");
     setDueDate("");
     setImmediatePayment(true);
     setPayMethod("cash");
+    setDate(new Date().toISOString().split("T")[0]);
+    setDialogOpen(true);
+  }
+
+  function openEdit(t: ERPTransaction) {
+    setEditingTransaction(t);
+    setSupplierId(t.supplier_id);
+    setNotes(t.notes || "");
+    setDate(new Date(t.created_at).toISOString().split("T")[0]);
+    setImmediatePayment(!!t.payment_method);
+    setPayMethod(t.payment_method || "cash");
+    setDueDate(t.due_date || "");
+
+    // Find siblings in client side transactions list
+    const baseNumber = t.txn_number.split("/")[0];
+    const siblings = transactions.filter(
+      (item) => item.txn_number.split("/")[0] === baseNumber
+    );
+
+    if (siblings.length > 0) {
+      setItems(
+        siblings.map((sib) => ({
+          materialId: sib.material_id,
+          weight: sib.weight,
+          price: sib.price_per_unit,
+          gstRate: sib.gst_rate || 0,
+        }))
+      );
+    } else {
+      setItems([
+        {
+          materialId: t.material_id,
+          weight: t.weight,
+          price: t.price_per_unit,
+          gstRate: t.gst_rate || 0,
+        },
+      ]);
+    }
     setDialogOpen(true);
   }
 
@@ -298,6 +341,7 @@ function ERPTransactionsPage() {
         notes: notes.trim() || null,
         due_date: immediatePayment ? null : dueDate || null,
         payment_method: immediatePayment ? payMethod : null,
+        created_at: date ? new Date(date).toISOString() : null,
         items: items.map((item) => ({
           material_id: item.materialId,
           weight: Number(item.weight),
@@ -306,14 +350,23 @@ function ERPTransactionsPage() {
         })),
       };
 
-      const res = await createERPTransaction(payload, session?.access_token);
-      if (res.success) {
-        toast.success("Scale transaction(s) recorded successfully!");
-        setDialogOpen(false);
-        loadTransactions();
+      if (editingTransaction) {
+        const res = await updateERPTransaction(editingTransaction.id, payload, session?.access_token);
+        if (res.success) {
+          toast.success("Scale transaction(s) updated successfully!");
+          setDialogOpen(false);
+          loadTransactions();
+        }
+      } else {
+        const res = await createERPTransaction(payload, session?.access_token);
+        if (res.success) {
+          toast.success("Scale transaction(s) recorded successfully!");
+          setDialogOpen(false);
+          loadTransactions();
+        }
       }
     } catch (err: any) {
-      toast.error(err.message || "Failed to record scale transaction");
+      toast.error(err.message || "Failed to save scale transaction");
     } finally {
       setSubmitting(false);
     }
@@ -448,6 +501,15 @@ function ERPTransactionsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          onClick={() => openEdit(t)}
+                          className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground cursor-pointer"
+                          title="Edit Scale Ticket"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => generatePDF(t)}
                           className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground cursor-pointer"
                           title="Download Invoice"
@@ -496,27 +558,41 @@ function ERPTransactionsPage() {
         <DialogContent className="max-w-2xl bg-card rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
-              <Scale className="h-5 w-5 text-primary" /> Log Scale Weigh Entry (B2B)
+              <Scale className="h-5 w-5 text-primary" /> {editingTransaction ? "Edit Scale Weigh Entry (B2B)" : "Log Scale Weigh Entry (B2B)"}
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="txn-supplier">Supplier Partner</Label>
-              <select
-                id="txn-supplier"
-                value={supplierId}
-                onChange={(e) => setSupplierId(e.target.value)}
-                required
-                className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
-              >
-                <option value="">Select Supplier...</option>
-                {suppliers.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="txn-supplier">Supplier Partner</Label>
+                <select
+                  id="txn-supplier"
+                  value={supplierId}
+                  onChange={(e) => setSupplierId(e.target.value)}
+                  required
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="">Select Supplier...</option>
+                  {suppliers.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="txn-date">Collection Date</Label>
+                <Input
+                  id="txn-date"
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  required
+                  className="rounded-xl border border-border"
+                />
+              </div>
             </div>
 
             {/* Materials List */}
@@ -682,7 +758,7 @@ function ERPTransactionsPage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={submitting} className="rounded-xl cursor-pointer">
-                {submitting ? "Saving Ticket..." : "Record Weighment"}
+                {submitting ? "Saving Ticket..." : editingTransaction ? "Save Changes" : "Record Weighment"}
               </Button>
             </DialogFooter>
           </form>

@@ -359,6 +359,13 @@ export async function createERPTransaction(payload: any, token?: string): Promis
   });
 }
 
+export async function updateERPTransaction(txnId: string, payload: any, token?: string): Promise<{ success: boolean; message: string; transaction: ERPTransaction; invoice: ERPInvoice }> {
+  return authFetch(`${API_BASE}/api/erp/transactions/${txnId}`, token, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function deleteERPTransaction(txnId: string, token?: string): Promise<{ success: boolean; message: string }> {
   return authFetch(`${API_BASE}/api/erp/transactions/${txnId}`, token, {
     method: "DELETE",

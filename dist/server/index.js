@@ -1,5 +1,5 @@
-import { w } from "./assets/worker-entry-BeeBc_ua.js";
-import "./assets/vendor-DwbuQL-J.js";
+import { w } from "./assets/worker-entry-DnIjba1j.js";
+import "./assets/vendor-CEtpOJd4.js";
 import "node:events";
 import "node:async_hooks";
 import "node:stream/web";
