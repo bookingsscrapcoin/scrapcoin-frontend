@@ -12,6 +12,7 @@ import {
   type ERPMaterial,
   type ERPCustomer,
 } from "@/lib/api";
+import { groupReceipts, type GroupedERPPurchaseReceipt } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,7 +41,7 @@ export const Route = createLazyFileRoute("/admin/erp/receipts")({
 });
 
 // A5 PDF Generator for B2C Receipts
-async function generateReceiptPDF(r: ERPPurchaseReceipt) {
+async function generateReceiptPDF(r: GroupedERPPurchaseReceipt) {
   const windowObj = window as any;
   if (!windowObj.jspdf) {
     await new Promise<void>((resolve, reject) => {
@@ -107,28 +108,46 @@ async function generateReceiptPDF(r: ERPPurchaseReceipt) {
   rta("Rate/Unit", PW - 36, ty + 5.5);
   rta("Payout", PW - 12, ty + 5.5);
 
-  sf(GREY); sd(BORDER);
-  doc.rect(12, ty + 8, PW - 24, 12, "FD");
-  fn(9, "bold"); st(DARK);
-  doc.text(r.material_name, 16, ty + 16);
-  fn(9); st(MID);
-  doc.text(`${r.weight} ${r.unit}`, 72, ty + 16);
-  rta(inr(r.price_per_unit), PW - 36, ty + 16);
-  fn(10, "bold"); st(DARK);
-  rta(inr(r.total_amount), PW - 12, ty + 16);
+  const items = r.materials || [
+    {
+      material_name: r.material_name,
+      weight: r.weight,
+      unit: r.unit,
+      price_per_unit: r.price_per_unit,
+      total_amount: r.total_amount,
+    },
+  ];
+
+  let currentY = ty + 8;
+  items.forEach((item, index) => {
+    sf(index % 2 === 0 ? GREY : WHITE);
+    sd(BORDER);
+    doc.rect(12, currentY, PW - 24, 10, "FD");
+    fn(8, "bold");
+    st(DARK);
+    doc.text(item.material_name, 16, currentY + 6.5);
+    fn(8);
+    st(MID);
+    doc.text(`${item.weight} ${item.unit}`, 72, currentY + 6.5);
+    rta(inr(item.price_per_unit), PW - 36, currentY + 6.5);
+    fn(8.5, "bold");
+    st(DARK);
+    rta(inr(item.total_amount), PW - 12, currentY + 6.5);
+    currentY += 10;
+  });
 
   // Total payout highlight box
-  sf(AMBER); doc.roundedRect(PW - 70, ty + 26, 58, 16, 2, 2, "F");
-  fn(8); st(WHITE); doc.text("TOTAL CASH PAID OUT", PW - 68, ty + 33);
-  fn(14, "bold"); rta(inr(r.total_amount), PW - 12, ty + 40);
+  sf(AMBER); doc.roundedRect(PW - 70, currentY + 6, 58, 16, 2, 2, "F");
+  fn(8); st(WHITE); doc.text("TOTAL CASH PAID OUT", PW - 68, currentY + 13);
+  fn(14, "bold"); rta(inr(r.total_amount), PW - 12, currentY + 20);
 
   // PAID green stamp
   fn(28, "bold"); st([...GREEN, 0.08]);
-  doc.text("PAID", PW / 2 - 8, ty + 38);
+  doc.text("PAID", PW / 2 - 8, currentY + 18);
 
   if (r.notes) {
     fn(7); st(MID);
-    doc.text("Note: " + r.notes, 12, ty + 62);
+    doc.text("Note: " + r.notes, 12, currentY + 30);
   }
 
   // Footer
@@ -144,7 +163,7 @@ function ERPReceiptsPage() {
   const { session, profile } = useAuth();
   const isAdmin = profile?.role === "admin";
 
-  const [receipts, setReceipts] = useState<ERPPurchaseReceipt[]>([]);
+  const [receipts, setReceipts] = useState<GroupedERPPurchaseReceipt[]>([]);
   const [materials, setMaterials] = useState<ERPMaterial[]>([]);
   const [customers, setCustomers] = useState<ERPCustomer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -159,7 +178,7 @@ function ERPReceiptsPage() {
   const [payMethod, setPayMethod] = useState("cash");
   const [notes, setNotes] = useState("");
   const [date, setDate] = useState("");
-  const [editingReceipt, setEditingReceipt] = useState<ERPPurchaseReceipt | null>(null);
+  const [editingReceipt, setEditingReceipt] = useState<GroupedERPPurchaseReceipt | null>(null);
 
   type ReceiptItem = {
     materialId: string;
@@ -209,7 +228,7 @@ function ERPReceiptsPage() {
     try {
       const res = await fetchERPPurchaseReceipts(session.access_token);
       if (res.success) {
-        setReceipts(res.receipts);
+        setReceipts(groupReceipts(res.receipts));
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to load receipts");
@@ -228,29 +247,21 @@ function ERPReceiptsPage() {
     setDialogOpen(true);
   }
 
-  function openEdit(r: ERPPurchaseReceipt) {
+  function openEdit(r: GroupedERPPurchaseReceipt) {
     setEditingReceipt(r);
     setCustomerId(r.customer_id || "");
     setPayMethod(r.payment_method);
     setNotes(r.notes || "");
     setDate(new Date(r.created_at).toISOString().split("T")[0]);
 
-    // Find siblings (all parts of the same multi-material receipt)
-    const baseNumber = r.receipt_number.split("/")[0];
-    const siblings = receipts.filter(
-      (item) => item.receipt_number.split("/")[0] === baseNumber
-    );
-
-    if (siblings.length > 0) {
+    if (r.materials && r.materials.length > 0) {
       setItems(
-        siblings.map((sib) => ({
-          materialId: sib.material_id,
-          weight: sib.weight,
-          price: sib.price_per_unit,
+        r.materials.map((m) => ({
+          materialId: m.material_id,
+          weight: m.weight,
+          price: m.price_per_unit,
         }))
       );
-    } else {
-      setItems([{ materialId: r.material_id, weight: r.weight, price: r.price_per_unit }]);
     }
     setDialogOpen(true);
   }
@@ -404,7 +415,9 @@ function ERPReceiptsPage() {
                     <td className="px-6 py-4 text-right font-semibold text-foreground whitespace-nowrap">
                       {r.weight.toLocaleString()} {r.unit}
                     </td>
-                    <td className="px-6 py-4 text-right text-muted-foreground">₹{r.price_per_unit.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-right text-muted-foreground">
+                      {r.materials && r.materials.length > 1 ? "Various" : `₹${r.price_per_unit.toFixed(2)}`}
+                    </td>
                     <td className="px-6 py-4 text-right font-bold text-foreground">₹{r.total_amount.toLocaleString()}</td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">

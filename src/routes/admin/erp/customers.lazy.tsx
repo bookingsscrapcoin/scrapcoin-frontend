@@ -9,6 +9,7 @@ import {
   deleteERPCustomer,
   type ERPCustomer,
 } from "@/lib/api";
+import { groupReceipts, type GroupedERPPurchaseReceipt } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,7 +54,7 @@ function ERPCustomersPage() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<ERPCustomer | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<ERPCustomer | null>(null);
-  const [recentReceipts, setRecentReceipts] = useState<any[]>([]);
+  const [recentReceipts, setRecentReceipts] = useState<GroupedERPPurchaseReceipt[]>([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
   // Form states
@@ -119,7 +120,7 @@ function ERPCustomersPage() {
     try {
       const res = await fetchERPCustomerDetail(c.id, session?.access_token);
       if (res.success) {
-        setRecentReceipts(res.receipts);
+        setRecentReceipts(groupReceipts(res.receipts));
       }
     } catch {
       toast.error("Could not fetch customer ledger logs");
