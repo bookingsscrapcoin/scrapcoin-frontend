@@ -139,6 +139,8 @@ export type ERPTransaction = {
   invoice_number?: string;
   invoice_status?: "pending" | "paid" | "overdue" | "cancelled";
   invoice_id?: string | null;
+  payment_method?: string | null;
+  due_date?: string | null;
 };
 
 export type ERPInvoice = {

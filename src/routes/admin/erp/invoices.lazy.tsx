@@ -29,6 +29,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+import { groupInvoices, type GroupedERPInvoice } from "@/lib/utils";
+
 export const Route = createLazyFileRoute("/admin/erp/invoices")({
   component: ERPInvoicesPage,
 });
@@ -41,7 +43,7 @@ const STATUS_CONFIG = {
 };
 
 // jsPDF generator trigger
-async function generatePDFFromInvoice(i: ERPInvoice) {
+async function generatePDFFromInvoice(i: GroupedERPInvoice) {
   const windowObj = window as any;
   if (!windowObj.jspdf) {
     await new Promise<void>((resolve, reject) => {
@@ -134,21 +136,38 @@ async function generatePDFFromInvoice(i: ERPInvoice) {
   rta("PRICE", 170, tY + 7);
   rta("SUBTOTAL", 188, tY + 7);
 
-  const rY = tY + 10;
-  sf(WHITE); sd(BORDER); doc.rect(20, rY, 170, 14, "FD");
-  fn(8.5); st(CHAR);
-  doc.text("1", 25, rY + 9);
-  doc.text(`${i.material_name} Scrap collection B2B entry`, 33, rY + 9);
-  fn(8.5, "bold"); doc.text(i.material_name, 100, rY + 9);
-  fn(8.5); rta(`${i.weight} ${i.unit}`, 148, rY + 9);
-  rta(inr(i.price_per_unit), 170, rY + 9);
-  fn(8.5, "bold"); rta(inr(i.amount), 188, rY + 9);
+  const materialsList = i.materials && i.materials.length > 0 ? i.materials : [{
+    id: i.id,
+    transaction_id: i.transaction_id || "",
+    material_name: i.material_name,
+    weight: i.weight,
+    unit: i.unit,
+    price_per_unit: i.price_per_unit || 0,
+    amount: i.amount
+  }];
 
-  const totY = rY + 24;
+  let currentY = tY + 10;
+  const rowHeight = 10;
+
+  materialsList.forEach((item, index) => {
+    sf(WHITE); sd(BORDER); doc.rect(20, currentY, 170, rowHeight, "FD");
+    fn(8); st(CHAR);
+    doc.text(String(index + 1), 25, currentY + 6);
+    doc.text(`${item.material_name} Scrap collection B2B entry`, 33, currentY + 6);
+    fn(8, "bold"); doc.text(item.material_name, 100, currentY + 6);
+    fn(8); rta(`${item.weight} ${item.unit}`, 148, currentY + 6);
+    rta(inr(item.price_per_unit || 0), 170, currentY + 6);
+    fn(8, "bold"); rta(inr(item.amount), 188, currentY + 6);
+    currentY += rowHeight;
+  });
+
+  const totalSum = materialsList.reduce((sum, item) => sum + Number(item.amount), 0);
+
+  const totY = currentY + 10;
   sf(GREY_BG); sd(BORDER);
   doc.roundedRect(108, totY, 82, 40, 2, 2, "FD");
   fn(8.5); st(MUTED); doc.text("Subtotal", 113, totY + 10);
-  st(CHAR); rta(inr(i.amount), 188, totY + 10);
+  st(CHAR); rta(inr(totalSum), 188, totY + 10);
   doc.line(113, totY + 14, 188, totY + 14);
   fn(8.5); st(MUTED); doc.text(`GST (0%)`, 113, totY + 21);
   st(CHAR); rta(inr(0), 188, totY + 21);
@@ -157,7 +176,7 @@ async function generatePDFFromInvoice(i: ERPInvoice) {
   sf(AMBER); doc.roundedRect(108, totY + 27, 82, 13, 2, 2, "F");
   fn(10, "bold"); st(WHITE);
   doc.text("TOTAL COLLECTED", 113, totY + 35);
-  rta(inr(i.amount), 188, totY + 35);
+  rta(inr(totalSum), 188, totY + 35);
 
   fn(7.5); st(MUTED); doc.text("Notes:", 20, totY + 12);
   fn(7.5); st(CHAR); doc.text(i.notes || "No custom remarks recorded.", 20, totY + 18, { width: 80 });
@@ -178,7 +197,7 @@ async function generatePDFFromInvoice(i: ERPInvoice) {
 function ERPInvoicesPage() {
   const { session } = useAuth();
 
-  const [invoices, setInvoices] = useState<ERPInvoice[]>([]);
+  const [invoices, setInvoices] = useState<GroupedERPInvoice[]>([]);
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -186,7 +205,7 @@ function ERPInvoicesPage() {
 
   // Pay Dialog
   const [payDialogOpen, setPayDialogOpen] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<ERPInvoice | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<GroupedERPInvoice | null>(null);
   const [payMethod, setPayMethod] = useState<"cash" | "upi" | "bank_transfer" | "cheque">("cash");
   const [payNotes, setPayNotes] = useState("");
   const [paying, setPaying] = useState(false);
@@ -205,7 +224,7 @@ function ERPInvoicesPage() {
 
       const res = await fetchERPInvoices(session.access_token, params);
       if (res.success) {
-        setInvoices(res.invoices);
+        setInvoices(groupInvoices(res.invoices));
         setSummary(res.summary);
       }
     } catch (err: any) {
@@ -215,7 +234,7 @@ function ERPInvoicesPage() {
     }
   }
 
-  function openPay(i: ERPInvoice) {
+  function openPay(i: GroupedERPInvoice) {
     setSelectedInvoice(i);
     setPayMethod("cash");
     setPayNotes("");

@@ -38,6 +38,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+import { groupTransactions, type GroupedERPTransaction } from "@/lib/utils";
+
 export const Route = createLazyFileRoute("/admin/erp/transactions")({
   component: ERPTransactionsPage,
 });
@@ -50,7 +52,7 @@ const INVOICE_STATUS_COLORS = {
 };
 
 // CDN PDF Helper
-async function generatePDF(t: ERPTransaction) {
+async function generatePDF(t: GroupedERPTransaction) {
   const windowObj = window as any;
   if (!windowObj.jspdf) {
     await new Promise<void>((resolve, reject) => {
@@ -102,7 +104,7 @@ async function generatePDF(t: ERPTransaction) {
   const dateStr = new Date(t.created_at).toLocaleDateString("en-IN");
   const metaFields = [
     { label: "INVOICE DATE", value: dateStr },
-    { label: "DUE DATE", value: dateStr },
+    { label: "DUE DATE", value: t.due_date ? new Date(t.due_date).toLocaleDateString("en-IN") : dateStr },
     { label: "STATUS", value: (t.invoice_status || "pending").toUpperCase() },
     { label: "TRANSACTION", value: t.txn_number },
   ];
@@ -146,31 +148,53 @@ async function generatePDF(t: ERPTransaction) {
   rta("PRICE", 170, tY + 7);
   rta("SUBTOTAL", 188, tY + 7);
 
-  const rY = tY + 10;
-  sf(WHITE); sd(BORDER); doc.rect(20, rY, 170, 14, "FD");
-  fn(8.5); st(CHAR);
-  doc.text("1", 25, rY + 9);
-  doc.text(`${t.material_name} Scrap collection B2B entry`, 33, rY + 9);
-  fn(8.5, "bold"); doc.text(t.material_name, 100, rY + 9);
-  fn(8.5); rta(`${t.weight} ${t.unit}`, 148, rY + 9);
-  rta(inr(t.price_per_unit), 170, rY + 9);
-  fn(8.5, "bold"); rta(inr(t.subtotal), 188, rY + 9);
+  const materialsList = t.materials && t.materials.length > 0 ? t.materials : [{
+    id: t.id,
+    material_id: "",
+    material_name: t.material_name,
+    weight: t.weight,
+    unit: t.unit,
+    price_per_unit: t.price_per_unit,
+    subtotal: t.weight * t.price_per_unit,
+    gst_rate: 0,
+    gst_amount: 0,
+    total_amount: t.total_amount
+  }];
+
+  let currentY = tY + 10;
+  const rowHeight = 10;
+
+  materialsList.forEach((item, index) => {
+    sf(WHITE); sd(BORDER); doc.rect(20, currentY, 170, rowHeight, "FD");
+    fn(8); st(CHAR);
+    doc.text(String(index + 1), 25, currentY + 6);
+    doc.text(`${item.material_name} Scrap collection B2B entry`, 33, currentY + 6);
+    fn(8, "bold"); doc.text(item.material_name, 100, currentY + 6);
+    fn(8); rta(`${item.weight} ${item.unit}`, 148, currentY + 6);
+    rta(inr(item.price_per_unit), 170, currentY + 6);
+    fn(8, "bold"); rta(inr(item.subtotal), 188, currentY + 6);
+    currentY += rowHeight;
+  });
+
+  const subtotalSum = materialsList.reduce((sum, item) => sum + Number(item.subtotal), 0);
+  const gstSum = materialsList.reduce((sum, item) => sum + Number(item.gst_amount), 0);
+  const totalSum = materialsList.reduce((sum, item) => sum + Number(item.total_amount), 0);
 
   // 6. GST and final totals
-  const totY = rY + 24;
+  const totY = currentY + 10;
   sf(GREY_BG); sd(BORDER);
   doc.roundedRect(108, totY, 82, 40, 2, 2, "FD");
   fn(8.5); st(MUTED); doc.text("Subtotal", 113, totY + 10);
-  st(CHAR); rta(inr(t.subtotal), 188, totY + 10);
+  st(CHAR); rta(inr(subtotalSum), 188, totY + 10);
   doc.line(113, totY + 14, 188, totY + 14);
-  fn(8.5); st(MUTED); doc.text(`GST (${t.gst_rate}%)`, 113, totY + 21);
-  st(CHAR); rta(inr(t.gst_amount), 188, totY + 21);
+  fn(8.5); st(MUTED); doc.text(`GST`, 113, totY + 21);
+  st(CHAR); rta(inr(gstSum), 188, totY + 21);
   doc.line(113, totY + 25, 188, totY + 25);
 
   sf(AMBER); doc.roundedRect(108, totY + 27, 82, 13, 2, 2, "F");
   fn(10, "bold"); st(WHITE);
   doc.text("TOTAL COLLECTED", 113, totY + 35);
-  rta(inr(t.total_amount), 188, totY + 35);
+  rta(inr(totalSum), 188, totY + 35);
 
   fn(7.5); st(MUTED); doc.text("Notes:", 20, totY + 12);
   fn(7.5); st(CHAR); doc.text(t.notes || "No custom remarks recorded.", 20, totY + 18, { width: 80 });
@@ -194,7 +218,7 @@ function ERPTransactionsPage() {
   const { session, profile } = useAuth();
   const isAdmin = profile?.role === "admin";
 
-  const [transactions, setTransactions] = useState<ERPTransaction[]>([]);
+  const [transactions, setTransactions] = useState<GroupedERPTransaction[]>([]);
   const [materials, setMaterials] = useState<ERPMaterial[]>([]);
   const [suppliers, setSuppliers] = useState<ERPSupplier[]>([]);
   const [loading, setLoading] = useState(true);
@@ -211,7 +235,7 @@ function ERPTransactionsPage() {
   const [immediatePayment, setImmediatePayment] = useState(true);
   const [payMethod, setPayMethod] = useState("cash");
   const [date, setDate] = useState("");
-  const [editingTransaction, setEditingTransaction] = useState<ERPTransaction | null>(null);
+  const [editingTransaction, setEditingTransaction] = useState<GroupedERPTransaction | null>(null);
 
   type TransactionItem = {
     materialId: string;
@@ -265,7 +289,7 @@ function ERPTransactionsPage() {
       if (search) params.supplier_name = search;
       const res = await fetchERPTransactions(session.access_token, params);
       if (res.success) {
-        setTransactions(res.transactions);
+        setTransactions(groupTransactions(res.transactions));
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to load transactions log");
@@ -286,7 +310,7 @@ function ERPTransactionsPage() {
     setDialogOpen(true);
   }
 
-  function openEdit(t: ERPTransaction) {
+  function openEdit(t: GroupedERPTransaction) {
     setEditingTransaction(t);
     setSupplierId(t.supplier_id);
     setNotes(t.notes || "");
@@ -295,28 +319,22 @@ function ERPTransactionsPage() {
     setPayMethod(t.payment_method || "cash");
     setDueDate(t.due_date || "");
 
-    // Find siblings in client side transactions list
-    const baseNumber = t.txn_number.split("/")[0];
-    const siblings = transactions.filter(
-      (item) => item.txn_number.split("/")[0] === baseNumber
-    );
-
-    if (siblings.length > 0) {
+    if (t.materials && t.materials.length > 0) {
       setItems(
-        siblings.map((sib) => ({
-          materialId: sib.material_id,
-          weight: sib.weight,
-          price: sib.price_per_unit,
-          gstRate: sib.gst_rate || 0,
+        t.materials.map((m) => ({
+          materialId: m.material_id,
+          weight: m.weight,
+          price: m.price_per_unit,
+          gstRate: m.gst_rate || 0,
         }))
       );
     } else {
       setItems([
         {
-          materialId: t.material_id,
+          materialId: "",
           weight: t.weight,
           price: t.price_per_unit,
-          gstRate: t.gst_rate || 0,
+          gstRate: 0,
         },
       ]);
     }
@@ -372,7 +390,7 @@ function ERPTransactionsPage() {
     }
   }
 
-  async function handleWhatsApp(t: ERPTransaction) {
+  async function handleWhatsApp(t: GroupedERPTransaction) {
     try {
       const res = await sendERPWhatsApp(t.id, session?.access_token);
       if (res.success) {
@@ -477,14 +495,16 @@ function ERPTransactionsPage() {
                     <td className="px-6 py-4 text-foreground font-medium truncate max-w-[140px]">{t.supplier_name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="flex items-center gap-1.5 text-muted-foreground">
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: t.color_hex }} />
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: t.materials && t.materials.length > 1 ? "#a1a1aa" : t.color_hex }} />
                         {t.material_name}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right font-semibold text-foreground whitespace-nowrap">
                       {t.weight.toLocaleString()} {t.unit}
                     </td>
-                    <td className="px-6 py-4 text-right text-muted-foreground">₹{t.price_per_unit.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-right text-muted-foreground">
+                      {t.materials && t.materials.length > 1 ? "Various" : `₹${t.price_per_unit.toFixed(2)}`}
+                    </td>
                     <td className="px-6 py-4 text-right font-bold text-foreground">₹{t.total_amount.toLocaleString("en-IN")}</td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
                       <Badge
