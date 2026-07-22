@@ -140,7 +140,7 @@ function ERPDashboard() {
             {revenue.profit_loss >= 0 ? "+" : "-"}₹{Math.abs(revenue.profit_loss).toLocaleString("en-IN")}
           </p>
           <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
-            <span>Sell ₹{revenue.revenue_this_month.toLocaleString("en-IN")} − Buy ₹{revenue.buy_cost_this_month.toLocaleString("en-IN")}</span>
+            <span>Sell ₹{revenue.revenue_this_month.toLocaleString("en-IN")} − COGS (sold stock only)</span>
           </div>
         </div>
       </div>
@@ -324,10 +324,10 @@ function ERPDashboard() {
               <tr className="border-b border-border text-left text-muted-foreground">
                 <th className="pb-3 pr-4 font-medium">Material</th>
                 <th className="pb-3 pr-4 font-medium text-right">Bought (kg)</th>
-                <th className="pb-3 pr-4 font-medium text-right">Buy Cost</th>
                 <th className="pb-3 pr-4 font-medium text-right">Sold (kg)</th>
                 <th className="pb-3 pr-4 font-medium text-right">Sell Revenue</th>
-                <th className="pb-3 pr-4 font-medium text-right">Unsold Stock</th>
+                <th className="pb-3 pr-4 font-medium text-right">COGS (Sold)</th>
+                <th className="pb-3 pr-4 font-medium text-right">Inventory Value</th>
                 <th className="pb-3 font-medium text-right">Profit / Loss</th>
               </tr>
             </thead>
@@ -346,18 +346,23 @@ function ERPDashboard() {
                       </div>
                     </td>
                     <td className="py-3 pr-4 text-right text-muted-foreground">{m.buy_weight.toFixed(2)}</td>
-                    <td className="py-3 pr-4 text-right text-foreground">₹{m.buy_cost.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</td>
                     <td className="py-3 pr-4 text-right text-muted-foreground">{m.sell_weight.toFixed(2)}</td>
                     <td className="py-3 pr-4 text-right text-foreground">₹{m.sell_revenue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</td>
-                    <td className="py-3 pr-4 text-right text-muted-foreground">{m.unsold_weight.toFixed(2)} kg</td>
+                    <td className="py-3 pr-4 text-right text-foreground">₹{m.cogs.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</td>
+                    <td className="py-3 pr-4 text-right">
+                      <span className="text-blue-600 font-medium">{m.unsold_weight.toFixed(2)} kg</span>
+                      <span className="text-muted-foreground ml-1 text-[10px]">(₹{m.inventory_value.toLocaleString("en-IN", { maximumFractionDigits: 0 })})</span>
+                    </td>
                     <td className="py-3 text-right">
                       <span className={`inline-flex items-center gap-1 font-bold ${
                         m.profit_loss > 0 ? "text-emerald-600" :
                         m.profit_loss < 0 ? "text-red-600" : "text-muted-foreground"
                       }`}>
-                        {m.profit_loss > 0 ? "+" : ""}{m.profit_loss === 0 ? "—" : `₹${Math.abs(m.profit_loss).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`}
-                        {m.profit_loss > 0 && <ArrowUpRight className="h-3 w-3" />}
-                        {m.profit_loss < 0 && <ArrowDownRight className="h-3 w-3" />}
+                        {m.sell_weight === 0 ? <span className="text-blue-500 font-medium text-[10px]">In Inventory</span> : (
+                          <>{m.profit_loss > 0 ? "+" : ""}₹{Math.abs(m.profit_loss).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                          {m.profit_loss > 0 && <ArrowUpRight className="h-3 w-3" />}
+                          {m.profit_loss < 0 && <ArrowDownRight className="h-3 w-3" />}</>
+                        )}
                       </span>
                     </td>
                   </tr>
@@ -371,21 +376,22 @@ function ERPDashboard() {
                   <td className="pt-3 pr-4 text-right text-muted-foreground">
                     {(material_pnl || []).reduce((s, m) => s + m.buy_weight, 0).toFixed(2)}
                   </td>
-                  <td className="pt-3 pr-4 text-right text-foreground">
-                    ₹{(material_pnl || []).reduce((s, m) => s + m.buy_cost, 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
-                  </td>
                   <td className="pt-3 pr-4 text-right text-muted-foreground">
                     {(material_pnl || []).reduce((s, m) => s + m.sell_weight, 0).toFixed(2)}
                   </td>
                   <td className="pt-3 pr-4 text-right text-foreground">
                     ₹{(material_pnl || []).reduce((s, m) => s + m.sell_revenue, 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
                   </td>
-                  <td className="pt-3 pr-4 text-right text-muted-foreground">
+                  <td className="pt-3 pr-4 text-right text-foreground">
+                    ₹{(material_pnl || []).reduce((s, m) => s + m.cogs, 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  </td>
+                  <td className="pt-3 pr-4 text-right text-blue-600">
                     {(material_pnl || []).reduce((s, m) => s + m.unsold_weight, 0).toFixed(2)} kg
+                    <span className="text-muted-foreground ml-1 text-[10px] font-normal">(₹{(material_pnl || []).reduce((s, m) => s + m.inventory_value, 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })})</span>
                   </td>
                   <td className="pt-3 text-right">
                     {(() => {
-                      const total = (material_pnl || []).reduce((s, m) => s + m.profit_loss, 0);
+                      const total = (material_pnl || []).reduce((s, m) => s + (m.sell_weight > 0 ? m.profit_loss : 0), 0);
                       return (
                         <span className={`inline-flex items-center gap-1 ${total >= 0 ? "text-emerald-600" : "text-red-600"}`}>
                           {total >= 0 ? "+" : "-"}₹{Math.abs(total).toLocaleString("en-IN", { maximumFractionDigits: 2 })}

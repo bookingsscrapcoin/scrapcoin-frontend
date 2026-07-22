@@ -251,10 +251,13 @@ export type ERPDashboardData = {
     color_hex: string;
     buy_weight: number;
     buy_cost: number;
+    avg_buy_price: number;
     sell_weight: number;
     sell_revenue: number;
+    cogs: number;
     profit_loss: number;
     unsold_weight: number;
+    inventory_value: number;
   }[];
 };
 
