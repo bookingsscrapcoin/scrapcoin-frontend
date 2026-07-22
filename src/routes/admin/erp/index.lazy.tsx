@@ -140,18 +140,18 @@ function ERPDashboard() {
 
       {/* Charts section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Sales & Sell Trend Bar Chart */}
+        {/* Buy & Sell Trend Bar Chart */}
         <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-foreground">6-Month Purchase & Sell Trend</h2>
+            <h2 className="text-sm font-semibold text-foreground">6-Month Buy & Sell Trend</h2>
             <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: "#3b82f6" }} />
-                Purchase
+                Buy (from Customers)
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: "#10b981" }} />
-                Sell
+                <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: "#f59e0b" }} />
+                Sell (to Recyclers)
               </span>
             </div>
           </div>
@@ -168,8 +168,10 @@ function ERPDashboard() {
                   ]}
                   contentStyle={{ borderRadius: "10px", fontSize: 12 }}
                 />
-                <Bar dataKey="purchase_revenue" name="Purchase" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="sell_revenue" name="Sell" fill="#10b981" radius={[4, 4, 0, 0]} />
+                {/* sell_revenue = erp_purchase_receipts = Buy from Customers (B2C) */}
+                <Bar dataKey="sell_revenue" name="Buy (from Customers)" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                {/* purchase_revenue = erp_transactions = Sell to Recyclers (B2B) */}
+                <Bar dataKey="purchase_revenue" name="Sell (to Recyclers)" fill="#f59e0b" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
