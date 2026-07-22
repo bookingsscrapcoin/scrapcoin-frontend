@@ -33,6 +33,7 @@ import { Route as AdminErpWhatsappRouteImport } from './routes/admin/erp/whatsap
 import { Route as AdminErpTransactionsRouteImport } from './routes/admin/erp/transactions'
 import { Route as AdminErpSuppliersRouteImport } from './routes/admin/erp/suppliers'
 import { Route as AdminErpReceiptsRouteImport } from './routes/admin/erp/receipts'
+import { Route as AdminErpNotificationsRouteImport } from './routes/admin/erp/notifications'
 import { Route as AdminErpMaterialsRouteImport } from './routes/admin/erp/materials'
 import { Route as AdminErpInvoicesRouteImport } from './routes/admin/erp/invoices'
 import { Route as AdminErpCustomersRouteImport } from './routes/admin/erp/customers'
@@ -171,6 +172,13 @@ const AdminErpReceiptsRoute = AdminErpReceiptsRouteImport.update({
 } as any).lazy(() =>
   import('./routes/admin/erp/receipts.lazy').then((d) => d.Route),
 )
+const AdminErpNotificationsRoute = AdminErpNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminErpRoute,
+} as any).lazy(() =>
+  import('./routes/admin/erp/notifications.lazy').then((d) => d.Route),
+)
 const AdminErpMaterialsRoute = AdminErpMaterialsRouteImport.update({
   id: '/materials',
   path: '/materials',
@@ -216,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/admin/erp/customers': typeof AdminErpCustomersRoute
   '/admin/erp/invoices': typeof AdminErpInvoicesRoute
   '/admin/erp/materials': typeof AdminErpMaterialsRoute
+  '/admin/erp/notifications': typeof AdminErpNotificationsRoute
   '/admin/erp/receipts': typeof AdminErpReceiptsRoute
   '/admin/erp/suppliers': typeof AdminErpSuppliersRoute
   '/admin/erp/transactions': typeof AdminErpTransactionsRoute
@@ -244,6 +253,7 @@ export interface FileRoutesByTo {
   '/admin/erp/customers': typeof AdminErpCustomersRoute
   '/admin/erp/invoices': typeof AdminErpInvoicesRoute
   '/admin/erp/materials': typeof AdminErpMaterialsRoute
+  '/admin/erp/notifications': typeof AdminErpNotificationsRoute
   '/admin/erp/receipts': typeof AdminErpReceiptsRoute
   '/admin/erp/suppliers': typeof AdminErpSuppliersRoute
   '/admin/erp/transactions': typeof AdminErpTransactionsRoute
@@ -274,6 +284,7 @@ export interface FileRoutesById {
   '/admin/erp/customers': typeof AdminErpCustomersRoute
   '/admin/erp/invoices': typeof AdminErpInvoicesRoute
   '/admin/erp/materials': typeof AdminErpMaterialsRoute
+  '/admin/erp/notifications': typeof AdminErpNotificationsRoute
   '/admin/erp/receipts': typeof AdminErpReceiptsRoute
   '/admin/erp/suppliers': typeof AdminErpSuppliersRoute
   '/admin/erp/transactions': typeof AdminErpTransactionsRoute
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/admin/erp/customers'
     | '/admin/erp/invoices'
     | '/admin/erp/materials'
+    | '/admin/erp/notifications'
     | '/admin/erp/receipts'
     | '/admin/erp/suppliers'
     | '/admin/erp/transactions'
@@ -333,6 +345,7 @@ export interface FileRouteTypes {
     | '/admin/erp/customers'
     | '/admin/erp/invoices'
     | '/admin/erp/materials'
+    | '/admin/erp/notifications'
     | '/admin/erp/receipts'
     | '/admin/erp/suppliers'
     | '/admin/erp/transactions'
@@ -362,6 +375,7 @@ export interface FileRouteTypes {
     | '/admin/erp/customers'
     | '/admin/erp/invoices'
     | '/admin/erp/materials'
+    | '/admin/erp/notifications'
     | '/admin/erp/receipts'
     | '/admin/erp/suppliers'
     | '/admin/erp/transactions'
@@ -561,6 +575,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminErpReceiptsRouteImport
       parentRoute: typeof AdminErpRoute
     }
+    '/admin/erp/notifications': {
+      id: '/admin/erp/notifications'
+      path: '/notifications'
+      fullPath: '/admin/erp/notifications'
+      preLoaderRoute: typeof AdminErpNotificationsRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
     '/admin/erp/materials': {
       id: '/admin/erp/materials'
       path: '/materials'
@@ -589,6 +610,7 @@ interface AdminErpRouteChildren {
   AdminErpCustomersRoute: typeof AdminErpCustomersRoute
   AdminErpInvoicesRoute: typeof AdminErpInvoicesRoute
   AdminErpMaterialsRoute: typeof AdminErpMaterialsRoute
+  AdminErpNotificationsRoute: typeof AdminErpNotificationsRoute
   AdminErpReceiptsRoute: typeof AdminErpReceiptsRoute
   AdminErpSuppliersRoute: typeof AdminErpSuppliersRoute
   AdminErpTransactionsRoute: typeof AdminErpTransactionsRoute
@@ -600,6 +622,7 @@ const AdminErpRouteChildren: AdminErpRouteChildren = {
   AdminErpCustomersRoute: AdminErpCustomersRoute,
   AdminErpInvoicesRoute: AdminErpInvoicesRoute,
   AdminErpMaterialsRoute: AdminErpMaterialsRoute,
+  AdminErpNotificationsRoute: AdminErpNotificationsRoute,
   AdminErpReceiptsRoute: AdminErpReceiptsRoute,
   AdminErpSuppliersRoute: AdminErpSuppliersRoute,
   AdminErpTransactionsRoute: AdminErpTransactionsRoute,

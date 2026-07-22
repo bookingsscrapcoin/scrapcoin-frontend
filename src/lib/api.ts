@@ -421,3 +421,29 @@ export async function fetchERPWhatsAppLogs(token?: string): Promise<{ success: b
   return authFetch(`${API_BASE}/api/erp/whatsapp/logs`, token);
 }
 
+export type ERPNotification = {
+  id: string;
+  title: string;
+  message: string;
+  type: string;
+  booking_id?: string | null;
+  is_read: boolean;
+  created_at: string;
+};
+
+export async function fetchERPNotifications(token?: string): Promise<ERPNotification[]> {
+  return authFetch(`${API_BASE}/api/notifications`, token);
+}
+
+export async function markAllERPNotificationsRead(token?: string): Promise<{ success: boolean; message: string }> {
+  return authFetch(`${API_BASE}/api/notifications/mark-all-read`, token, {
+    method: "POST",
+  });
+}
+
+export async function clearAllERPNotifications(token?: string): Promise<{ success: boolean }> {
+  return authFetch(`${API_BASE}/api/notifications`, token, {
+    method: "DELETE",
+  });
+}
+
