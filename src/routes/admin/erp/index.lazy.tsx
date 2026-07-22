@@ -164,7 +164,7 @@ function ERPDashboard() {
                 <Tooltip
                   formatter={(value, name) => [
                     `₹${Number(value).toLocaleString("en-IN")}`,
-                    name === "purchase_revenue" ? "Purchase" : "Sell",
+                    name,
                   ]}
                   contentStyle={{ borderRadius: "10px", fontSize: 12 }}
                 />
