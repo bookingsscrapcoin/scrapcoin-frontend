@@ -202,6 +202,8 @@ export type ERPDashboardData = {
     revenue_this_month: number;
     weight_this_month: number;
     txn_count_this_month: number;
+    buy_cost_this_month: number;
+    profit_loss: number;
   };
   low_stock_alerts: {
     id: string;

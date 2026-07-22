@@ -6,11 +6,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import {
   TrendingUp,
+  TrendingDown,
   AlertTriangle,
   FileText,
   DollarSign,
   Scale,
   Calendar,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 import {
   BarChart,
@@ -113,27 +116,31 @@ function ERPDashboard() {
 
         <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-semibold uppercase tracking-wider">Transactions Count</span>
+            <span className="text-xs font-semibold uppercase tracking-wider">Purchase Count</span>
             <FileText className="h-4.5 w-4.5 text-amber-500" />
           </div>
           <p className="mt-2 text-2xl font-bold text-foreground">
             {revenue.txn_count_this_month}
           </p>
           <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
-            <span>B2B scale tickets logged</span>
+            <span>B2C receipts this month</span>
           </div>
         </div>
 
         <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-semibold uppercase tracking-wider">Outstanding Invoices</span>
-            <AlertTriangle className="h-4.5 w-4.5 text-red-500" />
+            <span className="text-xs font-semibold uppercase tracking-wider">Profit & Loss</span>
+            {revenue.profit_loss >= 0
+              ? <ArrowUpRight className="h-4.5 w-4.5 text-emerald-500" />
+              : <ArrowDownRight className="h-4.5 w-4.5 text-red-500" />}
           </div>
-          <p className="mt-2 text-2xl font-bold text-foreground">
-            ₹{invoice_summary.pending_amount.toLocaleString("en-IN")}
+          <p className={`mt-2 text-2xl font-bold ${
+            revenue.profit_loss >= 0 ? "text-emerald-600" : "text-red-600"
+          }`}>
+            {revenue.profit_loss >= 0 ? "+" : "-"}₹{Math.abs(revenue.profit_loss).toLocaleString("en-IN")}
           </p>
-          <div className="mt-1 flex items-center gap-1 text-[10px] text-red-500 font-medium">
-            <span>{invoice_summary.pending_count} pending invoices</span>
+          <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
+            <span>Sell ₹{revenue.revenue_this_month.toLocaleString("en-IN")} − Buy ₹{revenue.buy_cost_this_month.toLocaleString("en-IN")}</span>
           </div>
         </div>
       </div>
