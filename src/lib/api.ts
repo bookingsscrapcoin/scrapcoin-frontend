@@ -245,6 +245,17 @@ export type ERPDashboardData = {
     pending_amount: number;
     overdue_amount: number;
   };
+  material_pnl: {
+    material_id: string;
+    material_name: string;
+    color_hex: string;
+    buy_weight: number;
+    buy_cost: number;
+    sell_weight: number;
+    sell_revenue: number;
+    profit_loss: number;
+    unsold_weight: number;
+  }[];
 };
 
 // ── ERP API CLIENT CALLS ──────────────────────────────────────────────────────

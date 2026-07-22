@@ -80,7 +80,7 @@ function ERPDashboard() {
     );
   }
 
-  const { revenue, low_stock_alerts, recent_transactions, monthly_trend, top_materials, invoice_summary } = data;
+  const { revenue, low_stock_alerts, recent_transactions, monthly_trend, top_materials, invoice_summary, material_pnl } = data;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -310,6 +310,94 @@ function ERPDashboard() {
               </div>
             )}
           </div>
+        </div>
+      </div>
+      {/* Material-wise Profit & Loss Table */}
+      <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-foreground">Material-wise Profit &amp; Loss</h2>
+          <span className="text-[10px] text-muted-foreground">All time · Sell revenue − Buy cost</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-border text-left text-muted-foreground">
+                <th className="pb-3 pr-4 font-medium">Material</th>
+                <th className="pb-3 pr-4 font-medium text-right">Bought (kg)</th>
+                <th className="pb-3 pr-4 font-medium text-right">Buy Cost</th>
+                <th className="pb-3 pr-4 font-medium text-right">Sold (kg)</th>
+                <th className="pb-3 pr-4 font-medium text-right">Sell Revenue</th>
+                <th className="pb-3 pr-4 font-medium text-right">Unsold Stock</th>
+                <th className="pb-3 font-medium text-right">Profit / Loss</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {(material_pnl || []).length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-8 text-center text-muted-foreground">No transactions recorded yet.</td>
+                </tr>
+              ) : (
+                (material_pnl || []).map((m) => (
+                  <tr key={m.material_id} className="hover:bg-muted/30 transition-colors">
+                    <td className="py-3 pr-4">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ background: m.color_hex || "#ccc" }} />
+                        <span className="font-medium text-foreground">{m.material_name}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 pr-4 text-right text-muted-foreground">{m.buy_weight.toFixed(2)}</td>
+                    <td className="py-3 pr-4 text-right text-foreground">₹{m.buy_cost.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</td>
+                    <td className="py-3 pr-4 text-right text-muted-foreground">{m.sell_weight.toFixed(2)}</td>
+                    <td className="py-3 pr-4 text-right text-foreground">₹{m.sell_revenue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</td>
+                    <td className="py-3 pr-4 text-right text-muted-foreground">{m.unsold_weight.toFixed(2)} kg</td>
+                    <td className="py-3 text-right">
+                      <span className={`inline-flex items-center gap-1 font-bold ${
+                        m.profit_loss > 0 ? "text-emerald-600" :
+                        m.profit_loss < 0 ? "text-red-600" : "text-muted-foreground"
+                      }`}>
+                        {m.profit_loss > 0 ? "+" : ""}{m.profit_loss === 0 ? "—" : `₹${Math.abs(m.profit_loss).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`}
+                        {m.profit_loss > 0 && <ArrowUpRight className="h-3 w-3" />}
+                        {m.profit_loss < 0 && <ArrowDownRight className="h-3 w-3" />}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+            {(material_pnl || []).length > 0 && (
+              <tfoot>
+                <tr className="border-t-2 border-border font-bold text-xs">
+                  <td className="pt-3 pr-4 text-foreground">Total</td>
+                  <td className="pt-3 pr-4 text-right text-muted-foreground">
+                    {(material_pnl || []).reduce((s, m) => s + m.buy_weight, 0).toFixed(2)}
+                  </td>
+                  <td className="pt-3 pr-4 text-right text-foreground">
+                    ₹{(material_pnl || []).reduce((s, m) => s + m.buy_cost, 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  </td>
+                  <td className="pt-3 pr-4 text-right text-muted-foreground">
+                    {(material_pnl || []).reduce((s, m) => s + m.sell_weight, 0).toFixed(2)}
+                  </td>
+                  <td className="pt-3 pr-4 text-right text-foreground">
+                    ₹{(material_pnl || []).reduce((s, m) => s + m.sell_revenue, 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  </td>
+                  <td className="pt-3 pr-4 text-right text-muted-foreground">
+                    {(material_pnl || []).reduce((s, m) => s + m.unsold_weight, 0).toFixed(2)} kg
+                  </td>
+                  <td className="pt-3 text-right">
+                    {(() => {
+                      const total = (material_pnl || []).reduce((s, m) => s + m.profit_loss, 0);
+                      return (
+                        <span className={`inline-flex items-center gap-1 ${total >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                          {total >= 0 ? "+" : "-"}₹{Math.abs(total).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                          {total >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                        </span>
+                      );
+                    })()}
+                  </td>
+                </tr>
+              </tfoot>
+            )}
+          </table>
         </div>
       </div>
     </div>
