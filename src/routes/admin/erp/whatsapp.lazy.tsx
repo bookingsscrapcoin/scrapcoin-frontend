@@ -88,7 +88,7 @@ function ERPWhatsAppLogsPage() {
               <thead>
                 <tr className="border-b border-border bg-muted/40 font-medium text-muted-foreground">
                   <th className="px-6 py-4">Receipt Ref</th>
-                  <th className="px-6 py-4">Supplier Partner</th>
+                  <th className="px-6 py-4">Recycler</th>
                   <th className="px-6 py-4">Recipient Phone</th>
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4">Provider</th>
@@ -158,3 +158,4 @@ function ERPWhatsAppLogsPage() {
     </div>
   );
 }
+

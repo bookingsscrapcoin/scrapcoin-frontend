@@ -22,7 +22,7 @@ export const Route = createLazyFileRoute("/admin/erp")({
 const ERP_TABS = [
   { to: "/admin/erp", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/erp/materials", label: "Materials", icon: Boxes, exact: false },
-  { to: "/admin/erp/suppliers", label: "Suppliers", icon: Truck, exact: false },
+  { to: "/admin/erp/suppliers", label: "Recyclers", icon: Truck, exact: false },
   { to: "/admin/erp/transactions", label: "Scale Entry", icon: Scale, exact: false },
   { to: "/admin/erp/invoices", label: "Invoices", icon: FileText, exact: false },
   { to: "/admin/erp/customers", label: "Customers (B2C)", icon: Users, exact: false },
@@ -60,7 +60,7 @@ function ERPLayout() {
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-foreground">ERP Management</h1>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Manage B2B scale ticket entries, supplier invoices, material inventory, and B2C customer metrics.
+                Manage B2B scale ticket entries, recycler invoices, material inventory, and B2C customer metrics.
               </p>
             </div>
             <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary border border-primary/20">
@@ -96,3 +96,4 @@ function ERPLayout() {
     </AdminLayout>
   );
 }
+

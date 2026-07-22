@@ -119,7 +119,7 @@ async function generatePDF(t: GroupedERPTransaction) {
   sf(GREY_BG); sd(BORDER); doc.setLineWidth(0.2);
   doc.roundedRect(20, 75, 80, 30, 2, 2, "FD");
   fn(7, "bold"); st(AMBER); doc.text("BILL TO SUPPLIER", 25, 82);
-  fn(11, "bold"); st(DARK); doc.text((t.supplier_name || "Supplier Partner").slice(0, 26), 25, 90);
+  fn(11, "bold"); st(DARK); doc.text((t.supplier_name || "Recycler").slice(0, 26), 25, 90);
   fn(8); st(CHAR);
   if (t.supplier_phone) doc.text("Phone: " + t.supplier_phone, 25, 96);
 
@@ -343,7 +343,7 @@ function ERPTransactionsPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!supplierId) return toast.error("Supplier selection is required");
+    if (!supplierId) return toast.error("Recycler selection is required");
     if (items.length === 0) return toast.error("At least one material item is required");
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
@@ -472,7 +472,7 @@ function ERPTransactionsPage() {
               <thead>
                 <tr className="border-b border-border bg-muted/40 font-medium text-muted-foreground">
                   <th className="px-6 py-4">Ticket ID</th>
-                  <th className="px-6 py-4">Supplier</th>
+                  <th className="px-6 py-4">Recycler</th>
                   <th className="px-6 py-4">Material</th>
                   <th className="px-6 py-4 text-right">Weighed Qty</th>
                   <th className="px-6 py-4 text-right">Unit Rate</th>
@@ -585,7 +585,7 @@ function ERPTransactionsPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="txn-supplier">Supplier Partner</Label>
+                <Label htmlFor="txn-supplier">Recycler</Label>
                 <select
                   id="txn-supplier"
                   value={supplierId}
@@ -593,7 +593,7 @@ function ERPTransactionsPage() {
                   required
                   className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
                 >
-                  <option value="">Select Supplier...</option>
+                  <option value="">Select Recycler...</option>
                   {suppliers.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.name}
@@ -787,3 +787,4 @@ function ERPTransactionsPage() {
     </div>
   );
 }
+

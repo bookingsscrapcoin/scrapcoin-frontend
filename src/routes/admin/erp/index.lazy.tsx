@@ -236,7 +236,7 @@ function ERPDashboard() {
               <thead>
                 <tr className="border-b border-border text-left text-muted-foreground">
                   <th className="pb-3 pr-2 font-medium">Txn No.</th>
-                  <th className="pb-3 pr-2 font-medium">Supplier</th>
+                  <th className="pb-3 pr-2 font-medium">Recycler</th>
                   <th className="pb-3 pr-2 font-medium">Material</th>
                   <th className="pb-3 pr-2 font-medium">Weight</th>
                   <th className="pb-3 pr-2 font-medium text-right">Payout</th>

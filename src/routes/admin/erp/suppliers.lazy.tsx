@@ -131,7 +131,7 @@ function ERPSuppliersPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim()) return toast.error("Supplier name is required");
+    if (!name.trim()) return toast.error("Recycler name is required");
 
     const payload = {
       name: name.trim(),
@@ -148,14 +148,14 @@ function ERPSuppliersPage() {
       if (editingSupplier) {
         const res = await updateERPSupplier(editingSupplier.id, payload, session?.access_token);
         if (res.success) {
-          toast.success("Supplier profile updated");
+          toast.success("Recycler profile updated");
           setDialogOpen(false);
           loadSuppliers();
         }
       } else {
         const res = await createERPSupplier(payload, session?.access_token);
         if (res.success) {
-          toast.success("Supplier registered successfully");
+          toast.success("Recycler registered successfully");
           setDialogOpen(false);
           loadSuppliers();
         }
@@ -170,7 +170,7 @@ function ERPSuppliersPage() {
     try {
       const res = await deleteERPSupplier(id, session?.access_token);
       if (res.success) {
-        toast.success("Supplier profile deactivated");
+        toast.success("Recycler profile deactivated");
         loadSuppliers();
       }
     } catch (err: any) {
@@ -230,7 +230,7 @@ function ERPSuppliersPage() {
             <table className="w-full border-collapse text-left text-xs">
               <thead>
                 <tr className="border-b border-border bg-muted/40 font-medium text-muted-foreground">
-                  <th className="px-6 py-4">Supplier</th>
+                  <th className="px-6 py-4">Recycler</th>
                   <th className="px-6 py-4">Phone / Contact</th>
                   <th className="px-6 py-4">Verification ID</th>
                   <th className="px-6 py-4 text-right">Transactions</th>
@@ -314,7 +314,7 @@ function ERPSuppliersPage() {
                 {suppliers.length === 0 && (
                   <tr>
                     <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">
-                      No suppliers registered. Click "Register Supplier" to catalog.
+                      No suppliers registered. Click "Register Recycler" to catalog.
                     </td>
                   </tr>
                 )}
@@ -329,13 +329,13 @@ function ERPSuppliersPage() {
         <DialogContent className="max-w-md bg-card rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-foreground">
-              {editingSupplier ? "Edit Supplier profile" : "Register B2B Supplier"}
+              {editingSupplier ? "Edit Recycler profile" : "Register B2B Recycler"}
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="sup-name">Supplier Name / Business Name</Label>
+              <Label htmlFor="sup-name">Recycler Name / Business Name</Label>
               <Input
                 id="sup-name"
                 value={name}
@@ -531,3 +531,4 @@ function ERPSuppliersPage() {
     </div>
   );
 }
+

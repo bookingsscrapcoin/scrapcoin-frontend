@@ -368,7 +368,7 @@ function ERPInvoicesPage() {
               <thead>
                 <tr className="border-b border-border bg-muted/40 font-medium text-muted-foreground">
                   <th className="px-6 py-4">Invoice No</th>
-                  <th className="px-6 py-4">Supplier Partner</th>
+                  <th className="px-6 py-4">Recycler</th>
                   <th className="px-6 py-4">Scale Ticket Reference</th>
                   <th className="px-6 py-4 text-right">Bill Amount</th>
                   <th className="px-6 py-4 text-right">Due Date</th>
@@ -463,7 +463,7 @@ function ERPInvoicesPage() {
                   <span className="text-foreground font-bold">{selectedInvoice.invoice_number}</span>
                 </div>
                 <div className="flex justify-between font-medium">
-                  <span className="text-muted-foreground">Supplier:</span>
+                  <span className="text-muted-foreground">Recycler:</span>
                   <span className="text-foreground">{selectedInvoice.supplier_name}</span>
                 </div>
                 <div className="flex justify-between border-t border-border pt-1.5 font-bold text-sm">
@@ -521,3 +521,4 @@ function ERPInvoicesPage() {
     </div>
   );
 }
+
