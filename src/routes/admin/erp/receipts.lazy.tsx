@@ -282,7 +282,9 @@ function ERPReceiptsPage() {
         customer_id: customerId || null,
         payment_method: payMethod,
         notes: notes.trim() || null,
-        created_at: date ? new Date(date).toISOString() : null,
+        created_at: editingReceipt && date === new Date(editingReceipt.created_at).toISOString().split("T")[0]
+          ? editingReceipt.created_at
+          : (date ? new Date(date).toISOString() : null),
         items: items.map((item) => ({
           material_id: item.materialId,
           weight: Number(item.weight),

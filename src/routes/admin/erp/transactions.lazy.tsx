@@ -359,7 +359,9 @@ function ERPTransactionsPage() {
         notes: notes.trim() || null,
         due_date: immediatePayment ? null : dueDate || null,
         payment_method: immediatePayment ? payMethod : null,
-        created_at: date ? new Date(date).toISOString() : null,
+        created_at: editingTxn && date === new Date(editingTxn.created_at).toISOString().split("T")[0]
+          ? editingTxn.created_at
+          : (date ? new Date(date).toISOString() : null),
         items: items.map((item) => ({
           material_id: item.materialId,
           weight: Number(item.weight),
