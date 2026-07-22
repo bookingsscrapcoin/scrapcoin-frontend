@@ -256,6 +256,7 @@ export type ERPDashboardData = {
     sell_revenue: number;
     cogs: number;
     profit_loss: number;
+    profit_margin_pct?: number;
     unsold_weight: number;
     inventory_value: number;
   }[];

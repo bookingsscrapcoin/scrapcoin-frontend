@@ -328,13 +328,14 @@ function ERPDashboard() {
                 <th className="pb-3 pr-4 font-medium text-right">Sell Revenue</th>
                 <th className="pb-3 pr-4 font-medium text-right">COGS (Sold)</th>
                 <th className="pb-3 pr-4 font-medium text-right">Inventory Value</th>
-                <th className="pb-3 font-medium text-right">Profit / Loss</th>
+                <th className="pb-3 pr-4 font-medium text-right">Profit / Loss</th>
+                <th className="pb-3 font-medium text-right">Margin %</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {(material_pnl || []).length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-muted-foreground">No transactions recorded yet.</td>
+                  <td colSpan={8} className="py-8 text-center text-muted-foreground">No transactions recorded yet.</td>
                 </tr>
               ) : (
                 (material_pnl || []).map((m) => (
@@ -353,7 +354,7 @@ function ERPDashboard() {
                       <span className="text-blue-600 font-medium">{m.unsold_weight.toFixed(2)} kg</span>
                       <span className="text-muted-foreground ml-1 text-[10px]">(₹{m.inventory_value.toLocaleString("en-IN", { maximumFractionDigits: 0 })})</span>
                     </td>
-                    <td className="py-3 text-right">
+                    <td className="py-3 pr-4 text-right">
                       <span className={`inline-flex items-center gap-1 font-bold ${
                         m.profit_loss > 0 ? "text-emerald-600" :
                         m.profit_loss < 0 ? "text-red-600" : "text-muted-foreground"
@@ -364,6 +365,20 @@ function ERPDashboard() {
                           {m.profit_loss < 0 && <ArrowDownRight className="h-3 w-3" />}</>
                         )}
                       </span>
+                    </td>
+                    <td className="py-3 text-right">
+                      {m.sell_weight > 0 && m.cogs > 0 ? (
+                        (() => {
+                          const margin = m.profit_margin_pct !== undefined ? m.profit_margin_pct : Number(((m.profit_loss / m.cogs) * 100).toFixed(1));
+                          return (
+                            <span className={`font-bold ${margin > 0 ? "text-emerald-600" : margin < 0 ? "text-red-600" : "text-muted-foreground"}`}>
+                              {margin > 0 ? "+" : ""}{margin}%
+                            </span>
+                          );
+                        })()
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -389,13 +404,26 @@ function ERPDashboard() {
                     {(material_pnl || []).reduce((s, m) => s + m.unsold_weight, 0).toFixed(2)} kg
                     <span className="text-muted-foreground ml-1 text-[10px] font-normal">(₹{(material_pnl || []).reduce((s, m) => s + m.inventory_value, 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })})</span>
                   </td>
-                  <td className="pt-3 text-right">
+                  <td className="pt-3 pr-4 text-right">
                     {(() => {
                       const total = (material_pnl || []).reduce((s, m) => s + (m.sell_weight > 0 ? m.profit_loss : 0), 0);
                       return (
                         <span className={`inline-flex items-center gap-1 ${total >= 0 ? "text-emerald-600" : "text-red-600"}`}>
                           {total >= 0 ? "+" : "-"}₹{Math.abs(total).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
                           {total >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                        </span>
+                      );
+                    })()}
+                  </td>
+                  <td className="pt-3 text-right">
+                    {(() => {
+                      const totalCogs = (material_pnl || []).reduce((s, m) => s + m.cogs, 0);
+                      const totalProfit = (material_pnl || []).reduce((s, m) => s + (m.sell_weight > 0 ? m.profit_loss : 0), 0);
+                      const totalMargin = totalCogs > 0 ? ((totalProfit / totalCogs) * 100).toFixed(1) : "0.0";
+                      const numMargin = Number(totalMargin);
+                      return (
+                        <span className={`font-bold ${numMargin >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                          {numMargin >= 0 ? "+" : ""}{totalMargin}%
                         </span>
                       );
                     })()}
