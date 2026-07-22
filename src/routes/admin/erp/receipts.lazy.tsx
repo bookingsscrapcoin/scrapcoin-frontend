@@ -40,75 +40,11 @@ export const Route = createLazyFileRoute("/admin/erp/receipts")({
   component: ERPReceiptsPage,
 });
 
-// A5 PDF Generator for B2C Receipts
+import { generateStandardPDF } from "@/lib/pdfGenerator";
+
+// PDF Generator for B2C Receipts using standard format
 async function generateReceiptPDF(r: GroupedERPPurchaseReceipt) {
-  const windowObj = window as any;
-  if (!windowObj.jspdf) {
-    await new Promise<void>((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error("Failed to load PDF library"));
-      document.head.appendChild(script);
-    });
-  }
-  const { jsPDF } = windowObj.jspdf;
-  const doc = new jsPDF({ unit: "mm", format: "a5", orientation: "portrait" });
-  
-  const PW = 148, PH = 210;
-  const AMBER = [245, 166, 35];
-  const DARK = [13, 14, 15];
-  const WHITE = [255, 255, 255];
-  const GREY = [248, 249, 250];
-  const MID = [100, 110, 120];
-  const BORDER = [220, 222, 226];
-  const GREEN = [22, 163, 74];
-
-  const sf = (c: number[]) => doc.setFillColor(c[0], c[1], c[2]);
-  const st = (c: number[]) => doc.setTextColor(c[0], c[1], c[2]);
-  const sd = (c: number[]) => doc.setDrawColor(c[0], c[1], c[2]);
-  const fn = (sz: number, style = "normal") => {
-    doc.setFont("helvetica", style);
-    doc.setFontSize(sz);
-  };
-  const inr = (n: number) => "Rs. " + Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2 });
-  const rta = (txt: string, x: number, y: number) => doc.text(txt, x - doc.getTextWidth(txt), y);
-
-  // Header
-  sf(AMBER); doc.rect(0, 0, PW, 28, "F");
-  fn(16, "bold"); st(WHITE); doc.text("THE SCRAP CO.", 12, 11);
-  fn(7); st([255, 230, 170]);
-  doc.text("Sector 16C, Greater Noida West | support@scrapco.in", 12, 17);
-  fn(9, "bold"); st(WHITE); rta("PAYMENT RECEIPT", PW - 10, 11);
-  fn(8); st([255, 230, 170]); rta(r.receipt_number, PW - 10, 18);
-
-  // Date + Payment Method
-  fn(8); st(MID);
-  doc.text("Date: " + new Date(r.created_at).toLocaleDateString("en-IN"), 12, 36);
-  sf(GREY); sd(BORDER); doc.setLineWidth(0.2);
-  doc.roundedRect(PW - 42, 30, 32, 9, 2, 2, "FD");
-  fn(7, "bold"); st(DARK); rta(r.payment_method.toUpperCase(), PW - 11, 36);
-
-  // Paid to Customer details
-  sf(GREY); sd(BORDER);
-  doc.roundedRect(12, 42, PW - 24, 22, 2, 2, "FD");
-  fn(7, "bold"); st([180, 83, 9]); doc.text("PAID TO CUSTOMER", 17, 49);
-  fn(11, "bold"); st(DARK); doc.text(r.customer_name || "Walk-in Customer", 17, 57);
-  if (r.customer_phone) {
-    fn(8); st(MID);
-    doc.text("Phone: " + r.customer_phone, 17, 63);
-  }
-
-  // Items table
-  const ty = 72;
-  sf(DARK); doc.rect(12, ty, PW - 24, 8, "F");
-  fn(7, "bold"); st(AMBER);
-  doc.text("Material Collected", 16, ty + 5.5);
-  doc.text("Weighed Qty", 72, ty + 5.5);
-  rta("Rate/Unit", PW - 36, ty + 5.5);
-  rta("Payout", PW - 12, ty + 5.5);
-
-  const items = r.materials || [
+  const rawItems = r.materials || [
     {
       material_name: r.material_name,
       weight: r.weight,
@@ -118,45 +54,26 @@ async function generateReceiptPDF(r: GroupedERPPurchaseReceipt) {
     },
   ];
 
-  let currentY = ty + 8;
-  items.forEach((item, index) => {
-    sf(index % 2 === 0 ? GREY : WHITE);
-    sd(BORDER);
-    doc.rect(12, currentY, PW - 24, 10, "FD");
-    fn(8, "bold");
-    st(DARK);
-    doc.text(item.material_name, 16, currentY + 6.5);
-    fn(8);
-    st(MID);
-    doc.text(`${item.weight} ${item.unit}`, 72, currentY + 6.5);
-    rta(inr(item.price_per_unit), PW - 36, currentY + 6.5);
-    fn(8.5, "bold");
-    st(DARK);
-    rta(inr(item.total_amount), PW - 12, currentY + 6.5);
-    currentY += 10;
+  await generateStandardPDF({
+    docType: "PURCHASE",
+    docNumber: r.receipt_number,
+    docDate: r.created_at,
+    partyTitle: "BILL FROM",
+    partyName: r.customer_name || "Walk-in Customer",
+    partyMobile: r.customer_phone || "",
+    paymentMethod: r.payment_method || "CASH",
+    paidAmount: r.total_amount,
+    balanceAmount: 0,
+    notes: r.notes || undefined,
+    items: rawItems.map((item, idx) => ({
+      sNo: idx + 1,
+      name: item.material_name,
+      qty: item.weight,
+      unit: item.unit || "KGS",
+      rate: item.price_per_unit,
+      amount: item.total_amount,
+    })),
   });
-
-  // Total payout highlight box
-  sf(AMBER); doc.roundedRect(PW - 70, currentY + 6, 58, 16, 2, 2, "F");
-  fn(8); st(WHITE); doc.text("TOTAL CASH PAID OUT", PW - 68, currentY + 13);
-  fn(14, "bold"); rta(inr(r.total_amount), PW - 12, currentY + 20);
-
-  // PAID green stamp
-  fn(28, "bold"); st([...GREEN, 0.08]);
-  doc.text("PAID", PW / 2 - 8, currentY + 18);
-
-  if (r.notes) {
-    fn(7); st(MID);
-    doc.text("Note: " + r.notes, 12, currentY + 30);
-  }
-
-  // Footer
-  sf(DARK); doc.rect(0, PH - 14, PW, 14, "F");
-  fn(7, "bold"); st(AMBER); doc.text("THE SCRAP CO. ERP", 12, PH - 6);
-  fn(6.5); st([140, 145, 150]);
-  doc.text("support@scrapco.in | Doorstep Pickup Service", 50, PH - 6);
-
-  doc.save(`Receipt_${r.receipt_number}.pdf`);
 }
 
 function ERPReceiptsPage() {

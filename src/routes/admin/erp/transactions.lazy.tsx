@@ -51,104 +51,11 @@ const INVOICE_STATUS_COLORS = {
   cancelled: "bg-gray-100 text-gray-700 border-gray-200",
 };
 
-// CDN PDF Helper
+import { generateStandardPDF } from "@/lib/pdfGenerator";
+
+// PDF Helper using standard document template format
 async function generatePDF(t: GroupedERPTransaction) {
-  const windowObj = window as any;
-  if (!windowObj.jspdf) {
-    await new Promise<void>((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error("Failed to load PDF library"));
-      document.head.appendChild(script);
-    });
-  }
-  const { jsPDF } = windowObj.jspdf;
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  
-  const PW = 210, PH = 297;
-  const AMBER = [245, 166, 35];
-  const DARK = [13, 14, 15];
-  const CHAR = [50, 55, 60];
-  const MUTED = [160, 165, 172];
-  const BORDER = [220, 222, 226];
-  const WHITE = [255, 255, 255];
-  const AMB_LT = [254, 243, 219];
-  const GREY_BG = [248, 249, 250];
-
-  const sf = (c: number[]) => doc.setFillColor(c[0], c[1], c[2]);
-  const sd = (c: number[]) => doc.setDrawColor(c[0], c[1], c[2]);
-  const st = (c: number[]) => doc.setTextColor(c[0], c[1], c[2]);
-  const fn = (sz: number, style = "normal") => {
-    doc.setFont("helvetica", style);
-    doc.setFontSize(sz);
-  };
-  const rta = (txt: string, x: number, y: number) => doc.text(txt, x - doc.getTextWidth(txt), y);
-  const inr = (n: number) => "Rs. " + Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2 });
-
-  // 1. Header Band
-  sf(AMBER); doc.rect(0, 0, PW, 38, "F");
-  fn(22, "bold"); st(WHITE); doc.text("THE SCRAP CO. ERP", 20, 15);
-  fn(8); st([255, 230, 170]);
-  doc.text("The Scrap Co. Pvt. Ltd", 20, 21);
-  doc.text("GSTIN: 27AABCS1234D1Z5 | support@scrapco.in", 20, 26);
-  doc.text("Sector 16C, Greater Noida West, Uttar Pradesh - 201306", 20, 31);
-  fn(26, "bold"); st(WHITE); rta("INVOICE", PW - 20, 17);
-  fn(9); st([255, 230, 170]);
-  rta(t.invoice_number || t.txn_number, PW - 20, 25);
-  rta("TXN: " + t.txn_number, PW - 20, 31);
-
-  // 2. Meta Block
-  sf(AMB_LT); sd(AMB_LT);
-  doc.roundedRect(20, 44, 170, 22, 3, 3, "FD");
-  const dateStr = new Date(t.created_at).toLocaleDateString("en-IN");
-  const metaFields = [
-    { label: "INVOICE DATE", value: dateStr },
-    { label: "DUE DATE", value: t.due_date ? new Date(t.due_date).toLocaleDateString("en-IN") : dateStr },
-    { label: "STATUS", value: (t.invoice_status || "pending").toUpperCase() },
-    { label: "TRANSACTION", value: t.txn_number },
-  ];
-  metaFields.forEach((f, i) => {
-    const fx = 25 + i * 43;
-    fn(7); st(MUTED); doc.text(f.label, fx, 52);
-    fn(9, "bold"); st(CHAR);
-    doc.text(f.value, fx, 60);
-  });
-
-  // 3. Billing details
-  sf(GREY_BG); sd(BORDER); doc.setLineWidth(0.2);
-  doc.roundedRect(20, 75, 80, 30, 2, 2, "FD");
-  fn(7, "bold"); st(AMBER); doc.text("BILL TO SUPPLIER", 25, 82);
-  fn(11, "bold"); st(DARK); doc.text((t.supplier_name || "Recycler").slice(0, 26), 25, 90);
-  fn(8); st(CHAR);
-  if (t.supplier_phone) doc.text("Phone: " + t.supplier_phone, 25, 96);
-
-  // 4. Payment bank info
-  sf(GREY_BG); sd(BORDER);
-  doc.roundedRect(108, 75, 82, 30, 2, 2, "FD");
-  fn(7, "bold"); st(AMBER); doc.text("BANK PAYMENT INFO", 113, 82);
-  const info = [
-    ["UPI ID", "scrapco@icici"],
-    ["IFSC Code", "ICIC0000213"],
-    ["Account", "Scrap Co. ERP Ledger"],
-  ];
-  info.forEach(([lbl, val], i) => {
-    fn(7); st(MUTED); doc.text(lbl, 113, 89 + i * 7);
-    st(CHAR); rta(val, 188, 89 + i * 7);
-  });
-
-  // 5. Material purchase description
-  const tY = 117;
-  sf(DARK); doc.rect(20, tY, 170, 10, "F");
-  fn(7.5, "bold"); st(WHITE);
-  doc.text("#", 25, tY + 7);
-  doc.text("ITEM DESCRIPTION", 33, tY + 7);
-  doc.text("MATERIAL", 100, tY + 7);
-  rta("WEIGHT", 148, tY + 7);
-  rta("PRICE", 170, tY + 7);
-  rta("SUBTOTAL", 188, tY + 7);
-
-  const materialsList = t.materials && t.materials.length > 0 ? t.materials : [{
+  const rawItems = t.materials && t.materials.length > 0 ? t.materials : [{
     id: t.id,
     material_id: "",
     material_name: t.material_name,
@@ -161,57 +68,28 @@ async function generatePDF(t: GroupedERPTransaction) {
     total_amount: t.total_amount
   }];
 
-  let currentY = tY + 10;
-  const rowHeight = 10;
+  const totalAmount = rawItems.reduce((sum, item) => sum + Number(item.total_amount), 0);
 
-  materialsList.forEach((item, index) => {
-    sf(WHITE); sd(BORDER); doc.rect(20, currentY, 170, rowHeight, "FD");
-    fn(8); st(CHAR);
-    doc.text(String(index + 1), 25, currentY + 6);
-    doc.text(`${item.material_name} Scrap collection B2B entry`, 33, currentY + 6);
-    fn(8, "bold"); doc.text(item.material_name, 100, currentY + 6);
-    fn(8); rta(`${item.weight} ${item.unit}`, 148, currentY + 6);
-    rta(inr(item.price_per_unit), 170, currentY + 6);
-    fn(8, "bold"); rta(inr(item.subtotal), 188, currentY + 6);
-    currentY += rowHeight;
+  await generateStandardPDF({
+    docType: "SALE TICKET",
+    docNumber: t.txn_number,
+    docDate: t.created_at,
+    partyTitle: "BILL TO",
+    partyName: t.supplier_name || "Recycler",
+    partyMobile: t.supplier_phone || "",
+    paymentMethod: t.payment_method || "CASH",
+    paidAmount: totalAmount,
+    balanceAmount: 0,
+    notes: t.notes || undefined,
+    items: rawItems.map((item, idx) => ({
+      sNo: idx + 1,
+      name: item.material_name,
+      qty: item.weight,
+      unit: item.unit || "KGS",
+      rate: item.price_per_unit,
+      amount: item.total_amount,
+    })),
   });
-
-  const subtotalSum = materialsList.reduce((sum, item) => sum + Number(item.subtotal), 0);
-  const gstSum = materialsList.reduce((sum, item) => sum + Number(item.gst_amount), 0);
-  const totalSum = materialsList.reduce((sum, item) => sum + Number(item.total_amount), 0);
-
-  // 6. GST and final totals
-  const totY = currentY + 10;
-  sf(GREY_BG); sd(BORDER);
-  doc.roundedRect(108, totY, 82, 40, 2, 2, "FD");
-  fn(8.5); st(MUTED); doc.text("Subtotal", 113, totY + 10);
-  st(CHAR); rta(inr(subtotalSum), 188, totY + 10);
-  doc.line(113, totY + 14, 188, totY + 14);
-  fn(8.5); st(MUTED); doc.text(`GST`, 113, totY + 21);
-  st(CHAR); rta(inr(gstSum), 188, totY + 21);
-  doc.line(113, totY + 25, 188, totY + 25);
-
-  sf(AMBER); doc.roundedRect(108, totY + 27, 82, 13, 2, 2, "F");
-  fn(10, "bold"); st(WHITE);
-  doc.text("TOTAL COLLECTED", 113, totY + 35);
-  rta(inr(totalSum), 188, totY + 35);
-
-  fn(7.5); st(MUTED); doc.text("Notes:", 20, totY + 12);
-  fn(7.5); st(CHAR); doc.text(t.notes || "No custom remarks recorded.", 20, totY + 18, { width: 80 });
-
-  // 7. Footer
-  sf(DARK); doc.rect(0, PH - 14, PW, 14, "F");
-  fn(7.5, "bold"); st(AMBER); doc.text("THE SCRAP CO. ERP", 20, PH - 6);
-  fn(7); st([140, 145, 150]);
-  doc.text("support@scrapco.in | B2B Operations Portal", 57, PH - 6);
-
-  // Paid watermark
-  if (t.invoice_status === "paid") {
-    fn(50, "bold"); st([34, 197, 94]);
-    doc.text("PAID", PW / 2 - 20, PH / 2, { angle: 30 });
-  }
-
-  doc.save(`Invoice_${t.invoice_number || t.txn_number}.pdf`);
 }
 
 function ERPTransactionsPage() {
@@ -359,8 +237,8 @@ function ERPTransactionsPage() {
         notes: notes.trim() || null,
         due_date: immediatePayment ? null : dueDate || null,
         payment_method: immediatePayment ? payMethod : null,
-        created_at: editingTxn && date === new Date(editingTxn.created_at).toISOString().split("T")[0]
-          ? editingTxn.created_at
+        created_at: editingTransaction && date === new Date(editingTransaction.created_at).toISOString().split("T")[0]
+          ? editingTransaction.created_at
           : (date ? new Date(date).toISOString() : null),
         items: items.map((item) => ({
           material_id: item.materialId,
