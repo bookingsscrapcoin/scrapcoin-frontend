@@ -227,6 +227,8 @@ export type ERPDashboardData = {
   monthly_trend: {
     month: string;
     total_revenue: number;
+    purchase_revenue: number;
+    sell_revenue: number;
     transaction_count: number;
   }[];
   top_materials: {

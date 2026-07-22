@@ -23,6 +23,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  Legend,
 } from "recharts";
 
 export const Route = createLazyFileRoute("/admin/erp/")({
@@ -139,17 +140,36 @@ function ERPDashboard() {
 
       {/* Charts section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Sales Trend Bar Chart */}
+        {/* Sales & Sell Trend Bar Chart */}
         <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm lg:col-span-2">
-          <h2 className="text-sm font-semibold text-foreground mb-4">6-Month Purchase Trend</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-foreground">6-Month Purchase & Sell Trend</h2>
+            <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: "#3b82f6" }} />
+                Purchase
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: "#10b981" }} />
+                Sell
+              </span>
+            </div>
+          </div>
           <div className="h-[250px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthly_trend}>
+              <BarChart data={monthly_trend} barCategoryGap="30%" barGap={4}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${v/1000}k`} />
-                <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString()}`, "Revenue"]} />
-                <Bar dataKey="total_revenue" fill="var(--primary)" radius={[4, 4, 0, 0]} />
+                <Tooltip
+                  formatter={(value, name) => [
+                    `₹${Number(value).toLocaleString("en-IN")}`,
+                    name === "purchase_revenue" ? "Purchase" : "Sell",
+                  ]}
+                  contentStyle={{ borderRadius: "10px", fontSize: 12 }}
+                />
+                <Bar dataKey="purchase_revenue" name="Purchase" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="sell_revenue" name="Sell" fill="#10b981" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
