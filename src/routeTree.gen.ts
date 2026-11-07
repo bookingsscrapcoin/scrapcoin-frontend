@@ -9,95 +9,40 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as RegisterRouteImport } from './routes/register'
-import { Route as RatesRouteImport } from './routes/rates'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PartnerRouteImport } from './routes/partner'
-import { Route as MyBookingsRouteImport } from './routes/my-bookings'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ImpactRouteImport } from './routes/impact'
-import { Route as FaqRouteImport } from './routes/faq'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CareersRouteImport } from './routes/careers'
-import { Route as BlogRouteImport } from './routes/blog'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as CareersRouteImport } from './routes/careers'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ImpactRouteImport } from './routes/impact'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MyBookingsRouteImport } from './routes/my-bookings'
+import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RatesRouteImport } from './routes/rates'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as AdminUsersRouteImport } from './routes/admin/users'
-import { Route as AdminErpRouteImport } from './routes/admin/erp'
-import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 import { Route as AdminBookingsRouteImport } from './routes/admin/bookings'
+import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
+import { Route as AdminErpRouteImport } from './routes/admin/erp'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminErpIndexRouteImport } from './routes/admin/erp/index'
-import { Route as AdminErpWhatsappRouteImport } from './routes/admin/erp/whatsapp'
-import { Route as AdminErpTransactionsRouteImport } from './routes/admin/erp/transactions'
-import { Route as AdminErpSuppliersRouteImport } from './routes/admin/erp/suppliers'
-import { Route as AdminErpReportsRouteImport } from './routes/admin/erp/reports'
-import { Route as AdminErpReceiptsRouteImport } from './routes/admin/erp/receipts'
-import { Route as AdminErpNotificationsRouteImport } from './routes/admin/erp/notifications'
-import { Route as AdminErpMaterialsRouteImport } from './routes/admin/erp/materials'
-import { Route as AdminErpInvoicesRouteImport } from './routes/admin/erp/invoices'
-import { Route as AdminErpExpensesRouteImport } from './routes/admin/erp/expenses'
 import { Route as AdminErpCustomersRouteImport } from './routes/admin/erp/customers'
+import { Route as AdminErpExpensesRouteImport } from './routes/admin/erp/expenses'
+import { Route as AdminErpInvoicesRouteImport } from './routes/admin/erp/invoices'
+import { Route as AdminErpMaterialsRouteImport } from './routes/admin/erp/materials'
+import { Route as AdminErpNotificationsRouteImport } from './routes/admin/erp/notifications'
+import { Route as AdminErpReceiptsRouteImport } from './routes/admin/erp/receipts'
+import { Route as AdminErpReportsRouteImport } from './routes/admin/erp/reports'
+import { Route as AdminErpSuppliersRouteImport } from './routes/admin/erp/suppliers'
+import { Route as AdminErpTransactionsRouteImport } from './routes/admin/erp/transactions'
+import { Route as AdminErpWhatsappRouteImport } from './routes/admin/erp/whatsapp'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RatesRoute = RatesRouteImport.update({
-  id: '/rates',
-  path: '/rates',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PartnerRoute = PartnerRouteImport.update({
-  id: '/partner',
-  path: '/partner',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MyBookingsRoute = MyBookingsRouteImport.update({
-  id: '/my-bookings',
-  path: '/my-bookings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImpactRoute = ImpactRouteImport.update({
-  id: '/impact',
-  path: '/impact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CareersRoute = CareersRouteImport.update({
-  id: '/careers',
-  path: '/careers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -105,9 +50,64 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImpactRoute = ImpactRouteImport.update({
+  id: '/impact',
+  path: '/impact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyBookingsRoute = MyBookingsRouteImport.update({
+  id: '/my-bookings',
+  path: '/my-bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerRoute = PartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RatesRoute = RatesRouteImport.update({
+  id: '/rates',
+  path: '/rates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -115,23 +115,6 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/admin/index.lazy').then((d) => d.Route))
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/admin/users.lazy').then((d) => d.Route))
-const AdminErpRoute = AdminErpRouteImport.update({
-  id: '/admin/erp',
-  path: '/admin/erp',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/admin/erp.lazy').then((d) => d.Route))
-const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
-  id: '/admin/categories',
-  path: '/admin/categories',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() =>
-  import('./routes/admin/categories.lazy').then((d) => d.Route),
-)
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
   id: '/admin/bookings',
   path: '/admin/bookings',
@@ -139,6 +122,23 @@ const AdminBookingsRoute = AdminBookingsRouteImport.update({
 } as any).lazy(() =>
   import('./routes/admin/bookings.lazy').then((d) => d.Route),
 )
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/admin/categories',
+  path: '/admin/categories',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() =>
+  import('./routes/admin/categories.lazy').then((d) => d.Route),
+)
+const AdminErpRoute = AdminErpRouteImport.update({
+  id: '/admin/erp',
+  path: '/admin/erp',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/admin/erp.lazy').then((d) => d.Route))
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/admin/users.lazy').then((d) => d.Route))
 const AdminErpIndexRoute = AdminErpIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -146,40 +146,31 @@ const AdminErpIndexRoute = AdminErpIndexRouteImport.update({
 } as any).lazy(() =>
   import('./routes/admin/erp/index.lazy').then((d) => d.Route),
 )
-const AdminErpWhatsappRoute = AdminErpWhatsappRouteImport.update({
-  id: '/whatsapp',
-  path: '/whatsapp',
+const AdminErpCustomersRoute = AdminErpCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
   getParentRoute: () => AdminErpRoute,
 } as any).lazy(() =>
-  import('./routes/admin/erp/whatsapp.lazy').then((d) => d.Route),
+  import('./routes/admin/erp/customers.lazy').then((d) => d.Route),
 )
-const AdminErpTransactionsRoute = AdminErpTransactionsRouteImport.update({
-  id: '/transactions',
-  path: '/transactions',
+const AdminErpExpensesRoute = AdminErpExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
   getParentRoute: () => AdminErpRoute,
 } as any).lazy(() =>
-  import('./routes/admin/erp/transactions.lazy').then((d) => d.Route),
+  import('./routes/admin/erp/expenses.lazy').then((d) => d.Route),
 )
-const AdminErpSuppliersRoute = AdminErpSuppliersRouteImport.update({
-  id: '/suppliers',
-  path: '/suppliers',
+const AdminErpInvoicesRoute = AdminErpInvoicesRouteImport.update({
+  id: '/invoices',
+  path: '/invoices',
+  getParentRoute: () => AdminErpRoute,
+} as any)
+const AdminErpMaterialsRoute = AdminErpMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
   getParentRoute: () => AdminErpRoute,
 } as any).lazy(() =>
-  import('./routes/admin/erp/suppliers.lazy').then((d) => d.Route),
-)
-const AdminErpReportsRoute = AdminErpReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AdminErpRoute,
-} as any).lazy(() =>
-  import('./routes/admin/erp/reports.lazy').then((d) => d.Route),
-)
-const AdminErpReceiptsRoute = AdminErpReceiptsRouteImport.update({
-  id: '/receipts',
-  path: '/receipts',
-  getParentRoute: () => AdminErpRoute,
-} as any).lazy(() =>
-  import('./routes/admin/erp/receipts.lazy').then((d) => d.Route),
+  import('./routes/admin/erp/materials.lazy').then((d) => d.Route),
 )
 const AdminErpNotificationsRoute = AdminErpNotificationsRouteImport.update({
   id: '/notifications',
@@ -188,31 +179,40 @@ const AdminErpNotificationsRoute = AdminErpNotificationsRouteImport.update({
 } as any).lazy(() =>
   import('./routes/admin/erp/notifications.lazy').then((d) => d.Route),
 )
-const AdminErpMaterialsRoute = AdminErpMaterialsRouteImport.update({
-  id: '/materials',
-  path: '/materials',
+const AdminErpReceiptsRoute = AdminErpReceiptsRouteImport.update({
+  id: '/receipts',
+  path: '/receipts',
   getParentRoute: () => AdminErpRoute,
 } as any).lazy(() =>
-  import('./routes/admin/erp/materials.lazy').then((d) => d.Route),
+  import('./routes/admin/erp/receipts.lazy').then((d) => d.Route),
 )
-const AdminErpInvoicesRoute = AdminErpInvoicesRouteImport.update({
-  id: '/invoices',
-  path: '/invoices',
-  getParentRoute: () => AdminErpRoute,
-} as any)
-const AdminErpExpensesRoute = AdminErpExpensesRouteImport.update({
-  id: '/expenses',
-  path: '/expenses',
+const AdminErpReportsRoute = AdminErpReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AdminErpRoute,
 } as any).lazy(() =>
-  import('./routes/admin/erp/expenses.lazy').then((d) => d.Route),
+  import('./routes/admin/erp/reports.lazy').then((d) => d.Route),
 )
-const AdminErpCustomersRoute = AdminErpCustomersRouteImport.update({
-  id: '/customers',
-  path: '/customers',
+const AdminErpSuppliersRoute = AdminErpSuppliersRouteImport.update({
+  id: '/suppliers',
+  path: '/suppliers',
   getParentRoute: () => AdminErpRoute,
 } as any).lazy(() =>
-  import('./routes/admin/erp/customers.lazy').then((d) => d.Route),
+  import('./routes/admin/erp/suppliers.lazy').then((d) => d.Route),
+)
+const AdminErpTransactionsRoute = AdminErpTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AdminErpRoute,
+} as any).lazy(() =>
+  import('./routes/admin/erp/transactions.lazy').then((d) => d.Route),
+)
+const AdminErpWhatsappRoute = AdminErpWhatsappRouteImport.update({
+  id: '/whatsapp',
+  path: '/whatsapp',
+  getParentRoute: () => AdminErpRoute,
+} as any).lazy(() =>
+  import('./routes/admin/erp/whatsapp.lazy').then((d) => d.Route),
 )
 
 export interface FileRoutesByFullPath {
@@ -433,88 +433,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rates': {
-      id: '/rates'
-      path: '/rates'
-      fullPath: '/rates'
-      preLoaderRoute: typeof RatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/partner': {
-      id: '/partner'
-      path: '/partner'
-      fullPath: '/partner'
-      preLoaderRoute: typeof PartnerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/my-bookings': {
-      id: '/my-bookings'
-      path: '/my-bookings'
-      fullPath: '/my-bookings'
-      preLoaderRoute: typeof MyBookingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/impact': {
-      id: '/impact'
-      path: '/impact'
-      fullPath: '/impact'
-      preLoaderRoute: typeof ImpactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/careers': {
-      id: '/careers'
-      path: '/careers'
-      fullPath: '/careers'
-      preLoaderRoute: typeof CareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -524,11 +447,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/impact': {
+      id: '/impact'
+      path: '/impact'
+      fullPath: '/impact'
+      preLoaderRoute: typeof ImpactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-bookings': {
+      id: '/my-bookings'
+      path: '/my-bookings'
+      fullPath: '/my-bookings'
+      preLoaderRoute: typeof MyBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner': {
+      id: '/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rates': {
+      id: '/rates'
+      path: '/rates'
+      fullPath: '/rates'
+      preLoaderRoute: typeof RatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -538,18 +538,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/admin/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/erp': {
-      id: '/admin/erp'
-      path: '/admin/erp'
-      fullPath: '/admin/erp'
-      preLoaderRoute: typeof AdminErpRouteImport
+    '/admin/bookings': {
+      id: '/admin/bookings'
+      path: '/admin/bookings'
+      fullPath: '/admin/bookings'
+      preLoaderRoute: typeof AdminBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/categories': {
@@ -559,11 +552,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/bookings': {
-      id: '/admin/bookings'
-      path: '/admin/bookings'
-      fullPath: '/admin/bookings'
-      preLoaderRoute: typeof AdminBookingsRouteImport
+    '/admin/erp': {
+      id: '/admin/erp'
+      path: '/admin/erp'
+      fullPath: '/admin/erp'
+      preLoaderRoute: typeof AdminErpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/erp/': {
@@ -573,60 +573,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminErpIndexRouteImport
       parentRoute: typeof AdminErpRoute
     }
-    '/admin/erp/whatsapp': {
-      id: '/admin/erp/whatsapp'
-      path: '/whatsapp'
-      fullPath: '/admin/erp/whatsapp'
-      preLoaderRoute: typeof AdminErpWhatsappRouteImport
-      parentRoute: typeof AdminErpRoute
-    }
-    '/admin/erp/transactions': {
-      id: '/admin/erp/transactions'
-      path: '/transactions'
-      fullPath: '/admin/erp/transactions'
-      preLoaderRoute: typeof AdminErpTransactionsRouteImport
-      parentRoute: typeof AdminErpRoute
-    }
-    '/admin/erp/suppliers': {
-      id: '/admin/erp/suppliers'
-      path: '/suppliers'
-      fullPath: '/admin/erp/suppliers'
-      preLoaderRoute: typeof AdminErpSuppliersRouteImport
-      parentRoute: typeof AdminErpRoute
-    }
-    '/admin/erp/reports': {
-      id: '/admin/erp/reports'
-      path: '/reports'
-      fullPath: '/admin/erp/reports'
-      preLoaderRoute: typeof AdminErpReportsRouteImport
-      parentRoute: typeof AdminErpRoute
-    }
-    '/admin/erp/receipts': {
-      id: '/admin/erp/receipts'
-      path: '/receipts'
-      fullPath: '/admin/erp/receipts'
-      preLoaderRoute: typeof AdminErpReceiptsRouteImport
-      parentRoute: typeof AdminErpRoute
-    }
-    '/admin/erp/notifications': {
-      id: '/admin/erp/notifications'
-      path: '/notifications'
-      fullPath: '/admin/erp/notifications'
-      preLoaderRoute: typeof AdminErpNotificationsRouteImport
-      parentRoute: typeof AdminErpRoute
-    }
-    '/admin/erp/materials': {
-      id: '/admin/erp/materials'
-      path: '/materials'
-      fullPath: '/admin/erp/materials'
-      preLoaderRoute: typeof AdminErpMaterialsRouteImport
-      parentRoute: typeof AdminErpRoute
-    }
-    '/admin/erp/invoices': {
-      id: '/admin/erp/invoices'
-      path: '/invoices'
-      fullPath: '/admin/erp/invoices'
-      preLoaderRoute: typeof AdminErpInvoicesRouteImport
+    '/admin/erp/customers': {
+      id: '/admin/erp/customers'
+      path: '/customers'
+      fullPath: '/admin/erp/customers'
+      preLoaderRoute: typeof AdminErpCustomersRouteImport
       parentRoute: typeof AdminErpRoute
     }
     '/admin/erp/expenses': {
@@ -636,11 +587,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminErpExpensesRouteImport
       parentRoute: typeof AdminErpRoute
     }
-    '/admin/erp/customers': {
-      id: '/admin/erp/customers'
-      path: '/customers'
-      fullPath: '/admin/erp/customers'
-      preLoaderRoute: typeof AdminErpCustomersRouteImport
+    '/admin/erp/invoices': {
+      id: '/admin/erp/invoices'
+      path: '/invoices'
+      fullPath: '/admin/erp/invoices'
+      preLoaderRoute: typeof AdminErpInvoicesRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/materials': {
+      id: '/admin/erp/materials'
+      path: '/materials'
+      fullPath: '/admin/erp/materials'
+      preLoaderRoute: typeof AdminErpMaterialsRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/notifications': {
+      id: '/admin/erp/notifications'
+      path: '/notifications'
+      fullPath: '/admin/erp/notifications'
+      preLoaderRoute: typeof AdminErpNotificationsRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/receipts': {
+      id: '/admin/erp/receipts'
+      path: '/receipts'
+      fullPath: '/admin/erp/receipts'
+      preLoaderRoute: typeof AdminErpReceiptsRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/reports': {
+      id: '/admin/erp/reports'
+      path: '/reports'
+      fullPath: '/admin/erp/reports'
+      preLoaderRoute: typeof AdminErpReportsRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/suppliers': {
+      id: '/admin/erp/suppliers'
+      path: '/suppliers'
+      fullPath: '/admin/erp/suppliers'
+      preLoaderRoute: typeof AdminErpSuppliersRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/transactions': {
+      id: '/admin/erp/transactions'
+      path: '/transactions'
+      fullPath: '/admin/erp/transactions'
+      preLoaderRoute: typeof AdminErpTransactionsRouteImport
+      parentRoute: typeof AdminErpRoute
+    }
+    '/admin/erp/whatsapp': {
+      id: '/admin/erp/whatsapp'
+      path: '/whatsapp'
+      fullPath: '/admin/erp/whatsapp'
+      preLoaderRoute: typeof AdminErpWhatsappRouteImport
       parentRoute: typeof AdminErpRoute
     }
   }

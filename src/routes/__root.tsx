@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
   useNavigate,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
@@ -56,7 +57,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   if (typeof window !== "undefined") {
     Sentry.captureException(error);
@@ -150,7 +151,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: ({ matches }) => {
     // Unknown URLs render NotFoundComponent under the root route, so the
     // root is the only place that can give the 404 page its own title.
-    const isNotFound = matches.some((m) => m.status === "notFound" || m.globalNotFound);
+    const isNotFound = matches.some((m) => m.status === "notFound" || m._notFound);
     return {
       meta: [
         { charSet: "utf-8" },
