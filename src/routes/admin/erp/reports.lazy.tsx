@@ -189,7 +189,7 @@ const billColumns: Column<Row<"bills">>[] = [
   { key: "society", label: "Society", value: (r) => r.society },
   { key: "materials", label: "Materials", value: (r) => r.materials.join("; "), render: (r) => <span className="line-clamp-2 max-w-[220px]" title={r.materials.join(", ")}>{r.materials.join(", ")}</span> },
   { key: "kg", label: "Weight", align: "right", value: (r) => r.kg, render: (r) => kg(r.kg) },
-  { key: "paid", label: "Paid", align: "right", value: (r) => r.paid, render: (r) => inr(r.paid) },
+  { key: "paid", label: "Paid", align: "right", value: (r) => r.paid, render: (r) => (r.donated ? <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Donated</span> : inr(r.paid)) },
   { key: "value", label: "Sale value", align: "right", value: (r) => r.est_value, render: (r) => inr(r.est_value) },
   { key: "profit", label: "Est. profit", align: "right", value: (r) => r.profit, render: (r) => <Money value={r.profit} strong /> },
   { key: "margin", label: "Margin", align: "right", value: (r) => r.margin_pct, render: (r) => pctText(r.margin_pct) },
@@ -240,7 +240,9 @@ const materialColumns: Column<Row<"materials">>[] = [
       <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: r.color_hex }} />{r.name}
     </span>
   ) },
-  { key: "bought", label: "Bought", align: "right", value: (r) => r.kg_bought, render: (r) => kg(r.kg_bought) },
+  { key: "bought", label: "Bought", align: "right", value: (r) => r.kg_bought, render: (r) => (
+    <span>{kg(r.kg_bought)}{!!r.kg_donated && <span className="block text-[10px] text-muted-foreground">{kg(r.kg_donated)} donated</span>}</span>
+  ) },
   { key: "share", label: "Share", align: "right", value: (r) => r.share_kg_pct, render: (r) => pctText(r.share_kg_pct) },
   { key: "buy", label: "Avg buy rate", align: "right", value: (r) => r.avg_buy_rate, render: (r) => inr(r.avg_buy_rate) },
   { key: "sell", label: "Avg sell rate", align: "right", value: (r) => r.avg_sell_rate, render: (r) => (
@@ -448,6 +450,10 @@ function ERPReports() {
           Profit is an estimate: weight × the average rate recyclers paid us for that material in this period (before GST),
           minus what we paid the customer. If a material wasn't sold in the period, all-time sales or the catalogue price is used.
           "After costs" also takes off this period's approved expenses, shared equally across pickups.
+          {s?.donated && s.donated.pickups > 0 && (
+            <> <b>Donated:</b> {s.donated.pickups} {s.donated.pickups === 1 ? "pickup" : "pickups"} ({kg(s.donated.kg)}, sale value {inr(s.donated.est_value)})
+            were given free and are included above at ₹0 paid. Avg buy rates leave them out.</>
+          )}
           {s && s.unpriced_materials.length > 0 && (
             <> <b>No sale price yet:</b> {s.unpriced_materials.join(", ")} (counted as zero value).</>
           )}

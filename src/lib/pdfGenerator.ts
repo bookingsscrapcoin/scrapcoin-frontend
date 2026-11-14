@@ -4,6 +4,7 @@
  */
 
 import { numberToWords } from "./utils";
+import { paymentModeLabel } from "./paymentModes";
 
 export interface PDFDocumentItem {
   sNo: number;
@@ -235,7 +236,7 @@ export async function buildStandardPDFDoc(options: PDFDocumentOptions): Promise<
   fn(8.5, "bold"); st(DARK);
   doc.text("Payment Mode:", M + 4, bottomStartY + 7);
   fn(8.5, "normal"); st(DARK);
-  doc.text((options.paymentMethod || "CASH").toUpperCase(), M + 30, bottomStartY + 7);
+  doc.text(paymentModeLabel(options.paymentMethod), M + 30, bottomStartY + 7);
 
   if (options.notes) {
     fn(8, "italic"); st(MID_GREY);
@@ -499,7 +500,7 @@ export async function generateReceiptImage(options: PDFDocumentOptions): Promise
   // Left: payment mode + notes
   fill(MID); ctx.font = "bold 8px Arial"; txt("Payment Mode:", PAD + 2, y + 16);
   fill(DARK); ctx.font = "bold 11px Arial";
-  txt((options.paymentMethod || "CASH").toUpperCase(), PAD + 2, y + 32);
+  txt(paymentModeLabel(options.paymentMethod), PAD + 2, y + 32);
   if (options.notes) {
     fill(MID); ctx.font = "8px Arial";
     txt(`Notes: ${options.notes}`, PAD + 2, y + 48, midX - PAD - 6);

@@ -322,10 +322,12 @@ export type ERPReport = {
     pickups: number; customers: number; expenses: number; net_profit: number;
     cost_per_pickup: number; profit_per_pickup: number; kg_per_pickup: number;
     unpriced_materials: string[];
+    // Pickups customers gave for free; already included in the totals above
+    donated?: { pickups: number; kg: number; est_value: number };
   };
   bills: (ReportMoney & {
     bill_no: string; date: string; customer_id: string | null; customer_name: string;
-    society: string; lines: number; materials: string[];
+    society: string; lines: number; materials: string[]; donated?: boolean;
   })[];
   customers: (ReportGroup & {
     customer_id: string | null; name: string; phone: string | null; society: string; lead_source: string;
@@ -335,7 +337,7 @@ export type ERPReport = {
   sources: (ReportGroup & { lead_source: string; customers: number })[];
   materials: {
     material_id: string | null; name: string; color_hex: string;
-    kg_bought: number; paid: number; avg_buy_rate: number | null;
+    kg_bought: number; kg_donated?: number; paid: number; avg_buy_rate: number | null;
     kg_sold: number; sale_revenue: number; avg_sell_rate: number | null;
     rate_source: "period" | "all_time" | "catalogue" | "none";
     margin_per_kg: number | null; est_profit: number; share_kg_pct: number | null;

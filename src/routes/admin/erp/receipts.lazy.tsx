@@ -22,6 +22,7 @@ import {
 } from "@/lib/api";
 import { groupReceipts, type GroupedERPPurchaseReceipt } from "@/lib/utils";
 import { exportReceiptsCsv } from "@/lib/exportCsv";
+import { DONATION, PICKUP_PAYMENT_MODES } from "@/lib/paymentModes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -256,12 +257,14 @@ function ERPReceiptsPage() {
   };
   const [items, setItems] = useState<ReceiptItem[]>([{ materialId: "", weight: "", price: "" }]);
 
+  const isDonation = payMethod === DONATION;
+  const buyPriceOf = (materialId: string) => materials.find((m) => m.id === materialId)?.buy_price ?? "";
+
   const handleItemChange = (index: number, key: keyof ReceiptItem, val: any) => {
     const newItems = [...items];
     if (key === "materialId") {
       newItems[index].materialId = val;
-      const selected = materials.find((m) => m.id === val);
-      newItems[index].price = selected ? selected.buy_price : "";
+      newItems[index].price = isDonation ? 0 : val ? buyPriceOf(val) : "";
     } else {
       newItems[index][key] = val;
     }
@@ -269,7 +272,14 @@ function ERPReceiptsPage() {
   };
 
   const addItemRow = () => {
-    setItems([...items, { materialId: "", weight: "", price: "" }]);
+    setItems([...items, { materialId: "", weight: "", price: isDonation ? 0 : "" }]);
+  };
+
+  // A donation is recorded at ₹0; switching back fills in the usual buying rates
+  const selectPayMethod = (m: string) => {
+    if (m === DONATION) setItems(items.map((item) => ({ ...item, price: 0 })));
+    else if (isDonation) setItems(items.map((item) => ({ ...item, price: item.materialId ? buyPriceOf(item.materialId) : "" })));
+    setPayMethod(m);
   };
 
   const removeItemRow = (index: number) => {
@@ -758,6 +768,7 @@ function ERPReceiptsPage() {
       if (!item.materialId) return toast.error(`Material selection is required for item #${i + 1}`);
       if (!item.weight || Number(item.weight) <= 0) return toast.error(`Please enter valid weight for item #${i + 1}`);
       if (item.price === "" || Number(item.price) < 0) return toast.error(`Please enter valid buying rate for item #${i + 1}`);
+      if (isDonation && Number(item.price) !== 0) return toast.error(`A donated pickup must have a buying rate of ₹0 (item #${i + 1})`);
     }
 
     setSubmitting(true);
@@ -1446,6 +1457,8 @@ function ERPReceiptsPage() {
                         onChange={(e) => handleItemChange(idx, "price", e.target.value !== "" ? Number(e.target.value) : "")}
                         placeholder="₹ 0.00"
                         required
+                        disabled={isDonation}
+                        title={isDonation ? "Donated: nothing is paid" : undefined}
                         className="rounded-lg h-8 py-1 text-[11px]"
                       />
                     </div>
@@ -1467,26 +1480,33 @@ function ERPReceiptsPage() {
             </div>
 
             <div className="rounded-xl border border-border bg-muted/10 p-4 flex justify-between items-center font-bold text-xs">
-              <span className="text-foreground">Total Cash Paid to Customer:</span>
-              <span className="text-primary text-sm">₹ {calcTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+              <span className="text-foreground">{isDonation ? "Donated by customer:" : "Total Cash Paid to Customer:"}</span>
+              <span className="text-primary text-sm">
+                {isDonation ? "No payment" : `₹ ${calcTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
+              </span>
             </div>
 
             <div className="space-y-1.5">
               <Label>Payment Mode</Label>
-              <div className="grid grid-cols-3 gap-2">
-                {["cash", "upi", "bank_transfer"].map((m) => (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {PICKUP_PAYMENT_MODES.map((m) => (
                   <Button
-                    key={m}
+                    key={m.value}
                     type="button"
-                    variant={payMethod === m ? "default" : "outline"}
+                    variant={payMethod === m.value ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setPayMethod(m)}
+                    onClick={() => selectPayMethod(m.value)}
                     className="rounded-xl text-[10px] uppercase font-bold cursor-pointer"
                   >
-                    {m.replace("_", " ")}
+                    {m.label}
                   </Button>
                 ))}
               </div>
+              {isDonation && (
+                <p className="text-[11px] text-muted-foreground">
+                  The customer gave this for free. It is added to stock at ₹0 and shown as donated on the receipt and in reports.
+                </p>
+              )}
             </div>
 
             <div className="space-y-1.5">
